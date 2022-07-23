@@ -1,0 +1,192 @@
+% !TeX encoding = UTF-8
+% !TeX spellcheck = en_US
+\documentclass[fontsize=11pt,paper=A4,landscape,DIV=24,BCOR=0pt,parskip=false,version=last]{scrartcl}
+%%\usepackage{lua-visual-debug}
+\usepackage{fontspec-luatex}
+\usepackage{libertine}
+\usepackage{multicol}
+\usepackage{csquotes}
+\usepackage[normalem]{ulem}
+\usepackage{tabularray}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\usepackage{pdfpages}
+
+\setmainfont{Linux Libertine O}
+\setsansfont{Linux Biolinum O}
+\setmonofont{Linux Libertine Mono O}
+
+\setlength{\parindent}{0pt}
+%\RedeclareSectionCommand[beforeskip=-5.5ex plus -1ex minus -.2ex,afterskip=1.3ex plus -.2ex]{section}
+%\setparsizes{0pt}{0pt}{0pt plus 1fil}
+%\setlength{\parfillskip}{0pt plus 1fil}
+
+%% For the usual 2-column table
+\NewTblrEnviron{kbdtblr}
+\SetTblrInner[kbdtblr]{
+    colspec={X[1,m]X[2,m,font=\small]},
+    row{odd} = {bg=gray9},
+    row{1}   = {bg=azure8,font=\large\sffamily\bfseries},
+}
+\newcommand{\mnem}[1]{\underline{\textbf{#1}}}
+\newcommand{\LKeyShiftF}[1]{\LKeyShift+\LKeyF{#1}}
+\newcommand{\LKeyCtrlF}[1]{\LKeyCtrl+\LKeyF{#1}}
+\newcommand{\hexrays}{\textsf{\tiny[Hex-Rays]}}
+
+\begin{document}
+\pagestyle{empty} % suppress the page number etc.
+
+\begin{multicols}{4}
+
+\begin{kbdtblr}{rl}
+\SetCell[c=2]{c} File Operations \\
+\LKeyCtrlF{9} & Parse C header file \\
+\LKeyAltF{10} & Create ASM file \\
+\LKeyCtrlX{W} & Save database \\
+{\LKeyAltF{4} \LKeyAltX{X}} & Exit and save \\
+\end{kbdtblr}
+
+\begin{kbdtblr}{rl}
+\SetCell[c=2]{c} Navigation \\
+\LKeyEnter & Jump to operand \\
+\LKeyAlt+\LKeyEnter & Jump in a new window \\
+\LKeyEsc & Jump back \\
+\LKeyCtrl+\LKeyEnter & Jump forward \\
+\LKey{G} & \mnem{G}o to address \\
+\LKeyCtrlX{L} & Jump by \mnem{l}abel (name) \\
+\LKeyCtrlX{P} & Jump by function (\mnem{p}roc) \\
+\LKeyCtrlX{S} & Jump to \mnem{s}egment \\
+\LKeyCtrlX{G} & Jump to segment register \\
+\LKeyCtrlX{X} & List \mnem{x}refs \emph{to} ... \\
+\LKey{X} & Jump to \mnem{x}ref to operand \\
+\LKeyTab & Jump to pseudocode \\
+\LKeyCtrlX{E} & Jump to \mnem{e}ntry point \\
+\LKeyAltX{M} & \mnem{B}ookmark position \\
+\LKeyCtrlX{M} & Jump to \mnem{b}ookark \\
+\LKeyCtrlX{Q} & Jump to problem \\
+\LKeyCtrlX{F} & Erroneous operand \\
+\end{kbdtblr}
+
+\begin{kbdtblr}{rl}
+\SetCell[c=2]{c} Search \\
+\LKeyAltX{C} & Next \mnem{c}ode \\
+\LKeyCtrlX{D} & Next \mnem{d}ata \\
+\LKeyCtrlX{A} & Next explored \\
+\LKeyCtrlX{U} & Next \mnem{u}nexplored \\
+\LKeyAltX{I} & \mnem{I}mmediate value \\
+\LKeyCtrlX{I} & Next \mnem{i}mmediate value \\
+\LKeyAltX{T} & \mnem{T}ext \\
+\LKeyCtrlX{T} & Next \mnem{t}ext \\
+\LKeyAltX{B} & Sequence of \mnem{b}ytes \\
+\LKeyCtrlX{B} & Next sequence of \mnem{b}ytes \\
+\end{kbdtblr}
+
+\begin{kbdtblr}{rl}
+\SetCell[c=2]{c} Edit \\
+\LKey{N} & Rename \\
+\LKey{C} & Make code \\
+\LKey{D} & Make string \\
+\LKey{D} & Make data / cycle types \\
+\LKey{U} & Undefine \\
+\LKey{asterisk} or \LKeyPad{13} & Make array \\
+\LKey{O} & Offset (data segment) \\
+\LKeyCtrlX{O} & Offset (current segment) \\
+\LKeyAltX{R} & Offset by (any segment) \\
+\LKeyCtrlX{R} & Offset (user-defined) \\
+\LKey{numbersign} & Number (default) \\
+\LKey{Q} & Hexadecimal \\
+\LKey{H} & Decimal \\
+\LKey{B} & \mnem{B}inary \\
+\LKey{R} & Cha\mnem{r}acter \\
+\LKey{S} & \mnem{S}egment \\
+\LKey{M} & Enum \mnem{m}ember \\
+\LKey{K} & Stac\mnem{k} variable \\
+\LKey{underscore} & Change sign \\
+\LKey{asciitilde} & Bitwise negate \\
+\LKeyAltX{A} & String literals \\
+\LKeyAltX{D} & Setup data types \\
+\LKeyAltX{S} & Edit segment \\
+\LKeyAltX{G} & Change segment register \\
+\LKeyAltX{Q} & Struct variable \\
+\LKeyAltX{Y} & Select union member \\
+\LKeyCtrlX{Z} & Undo \\
+\LKeyShiftCtrlX{Z} & Redo \\
+\end{kbdtblr}
+
+\begin{kbdtblr}{rl}
+\SetCell[c=2]{c} Comments \\
+\LKey{semicolon} & Repeatable comment \\
+%% On first instruction becomes the function comment
+\LKey{colon} & Comment \\
+\LKeyIns & Anterior lines \\
+%% Also works on database comment at the top
+\LKeyShift+\LKeyIns & Posterior lines \\
+\LKey{slash} & {\hexrays} Line comment
+\end{kbdtblr}
+
+\begin{kbdtblr}{rl}
+\SetCell[c=2]{c} Subviews \\
+\LKeyShiftF{1} & Open \emph{Local types} \\
+\LKeyShiftF{3} & Open \emph{Functions} \\
+\LKeyShiftF{4} & Open \emph{Names} \\
+\LKeyShiftF{5} & Open \emph{Signatures} \\
+\LKeyShiftF{7} & Open \emph{Segments} \\
+\LKeyShiftF{8} & Open \emph{Segment registers} \\
+\LKeyShiftF{9} & Open \emph{Structures} \\
+\LKeyShiftF{10} & Open \emph{Enumerations} \\
+\LKeyShiftF{11} & Open \emph{Type libraries} \\
+\LKeyShiftF{12} & Open \emph{Strings} \\
+\LKeyAltF{9} & Recent scripts \\
+\end{kbdtblr}
+
+\begin{kbdtblr}{rl}
+\SetCell[c=2]{c} Functions (aka procedures) \\
+\LKey{X} & Create function (\mnem{p}roc) \\
+\LKeyAltX{P} & Edit function (\mnem{p}roc) \\
+\LKey{E} & Set \mnem{e}nd of function \\
+\LKeyCtrlX{K} & Stac\mnem{k} variables \\
+\LKeyAltX{K} & Change stac\mnem{k} pointer \\
+\LKey{V} & Rename register \\
+\LKey{Y} & Set function t\mnem{y}pe \\
+\end{kbdtblr}
+
+\begin{kbdtblr}{rl}
+\SetCell[c=2]{c} Lumina (metadata service) \\
+\LKeyF{12} & Pull all metadata \\
+\LKeyCtrlF{12} & Push all metadata \\
+\LKeyAltF{12} & View all metadata \\
+\end{kbdtblr}
+
+\begin{kbdtblr}{rl}
+\SetCell[c=2]{c} Debugger \\
+\LKeyF{2} & Add breakpoint \\
+\LKeyF{9} & Start process \\
+\LKeyCtrlF{2} & Terminate process \\
+\LKeyF{7} & Step into \\
+\LKeyF{8} & Step over \\
+\LKeyCtrlF{7} & Run until return \\
+\LKeyF{4} & Run to cursor \\
+\LKeyCtrlAltX{B} & Breakpoint list \\
+\LKeyCtrlAltX{S} & Stack trace \\
+\end{kbdtblr}
+
+\begin{kbdtblr}{rl}
+\SetCell[c=2]{c} Dialog Boxes \\
+{\LKeyTab \\ \LKeyShift{}+\LKeyTab} & Navigate \\
+\LKeySpace && Toggle \\
+{\LKeyEnter \\ \LKeyAltX{K} \\ \LKeyCtrl{}+\LKeyEnter} & Confirm \\
+{\LKeyEsc \\ \LKeyAltF{4}} & Cancel \\
+\end{kbdtblr}
+
+\begin{kbdtblr}{rl}
+\SetCell[c=2]{c} Miscellaneous \\
+\LKey{question} & Evaluate expression (calculator) \\
+\LKeyCtrl{}+\LKeyTab & Window list (next) \\
+\LKeyAltX{1} ... \LKeyAltX{9} & Switch to window \#1...9 \\
+\end{kbdtblr}
+
+\end{multicols}
+
+%% \url{https://hex-rays.com/blog/igor-tip-of-the-week-01-lesser-known-keyboard-shortcuts-in-ida/}
+
+\end{document}

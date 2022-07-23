@@ -1,0 +1,65 @@
+\documentclass[version=last,fontsize=11pt,paper=A4]{scrartcl}
+%%\usepackage[german]{babel}
+\usepackage{csquotes}
+\usepackage{microtype}
+\usepackage{luaotfload}
+\directlua{luaotfload.add_fallback("genericfallback", {"NotoSerif:mode=node;"})}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{german}
+\setmainfont{TeX Gyre Bonum}[RawFeature={fallback=genericfallback}]
+\setsansfont{TeX Gyre Heros}
+\setmonofont{TeX Gyre Cursor}
+
+\begin{document}
+\thispagestyle{empty}
+
+% Quelle: https://recipes.instantpot.com/recipe/three-lentil-dal-makhani/
+
+\section*{Dal Makhni aus dem Instant Pot}
+
+\subsection*{Zutaten}
+
+\begin{itemize}
+    \item 2 Eßlöffel Butter oder Butterschmalz
+    \item 2 Eßlöffel Knoblauch, gehackt
+    \item 2 gehäufte Löffel frisch geriebener Ingwer
+    \item 1 Teelöffelspitze Kreuzkümmel
+    \item 1 Eßlöffel Garam Masala\\
+          alternativ 1 gehäufter Eßlöffel Garam-Masala-Paste
+    \item 1 Teelöffel Gelbwurzpulver\footnote{englisch Turmeric}
+    \item 1 Teelöffel (gestrichener) Salz
+    \item 1 Teelöffelspitze Cayenne-Pfeffer
+    \item 1 Zimtstange
+    \item 4 Kardamomkapseln (grün oder weiß)
+    \item 2 Lorbeerblätter
+    \item 1 Dose gehackte Tomaten\\
+          alternativ 400 bis 450 g frische gehackte Tomaten
+    \item 300 g Auswahl an Linsen, bspw.
+    \begin{itemize}
+        \item 200 g geschälte Uridlinsen + 100 g Berglinsen\footnote{Statt Berglinsen gehen im Zweifel auch grüne Linsen, bzw. Tellerlinsen.}
+        \item 100 g Uridlinsen + 100 g Belugalinsen + 100 g Berglinsen
+        \item 200 g rote Linsen + 100 g Berglinsen
+        \item 300 g geteilte Uridlinsen\footnote{Mit Schale, aber diese ist geöffnet. Entspricht am ehesten dem Original.}
+    \end{itemize}
+    \item 1 Liter Wasser
+    \item 150 bis 250 g Crème fraîche, je nach Verfügbarkeit\\
+          Schlagsahne geht auch, aber dann wird es dünnflüssiger.
+\end{itemize}
+
+\subsection*{Zubereitung}
+
+\begin{enumerate}
+    \item Sauté am Instant Pot setzen und auf 5 Minuten einstellen
+    \item Butter/Butterschmalz schmelzen
+    \item Gewürze hinzugeben und \enquote{anrösten} bis sie duften
+    \item Tomaten hinzugeben und rühren bis sie zu zerfallen beginnen, 1 bis 2 Minuten
+    \item Sauté ausschalten und Linsen einrühren
+    \item Wasser hinzugeben und Topf schließen
+    \item Modus \enquote{Meat/Stew} oder \enquote{Pressure cook} einstellen und auf hohem Druck (\enquote{High pressure}) für 20 Minuten einstellen
+    \item \enquote{Quick-release}-Methode benutzen um den Druck zu mindern und Topf danach öffnen.
+    \item Zimtstange, Kardamomkapseln und Lorbeerblätter suchen und wegwerfen
+    \item Crème fraîche (oder Sahne) gut einrühren und nochmals kurz ziehen lassen
+\end{enumerate}
+
+\end{document}

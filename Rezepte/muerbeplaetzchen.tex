@@ -1,0 +1,44 @@
+\documentclass[version=last,paper=A4]{scrartcl}
+%%\usepackage[german]{babel}
+\usepackage{microtype}
+\usepackage{luaotfload}
+\directlua{luaotfload.add_fallback("genericfallback", {"NotoSerif:mode=node;"})}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\usepackage{csquotes}
+\setmainlanguage{german}
+\setmainfont{TeX Gyre Bonum}[RawFeature={fallback=genericfallback}]
+\setsansfont{TeX Gyre Heros}
+\setmonofont{TeX Gyre Cursor}
+
+\begin{document}
+\thispagestyle{empty}
+
+\section*{Mürbeplätzchen}
+
+\subsection*{Zutaten}
+
+\begin{itemize}
+    \item 2~℔ Weizenmehl\\
+    Type 405 oder doppelgriffig (\enquote{Instant-Mehl})\footnote{Andere Mehlsorten verfälschen das Ergebnis.}
+    \item 350~g Kristallzucker, je feinkörniger desto besser
+    \item Buttervanille entsprechend der Mehlmenge
+    \item 2 gestrichene Teelöffel Salz
+    \item 1~℔ Butter\footnote{Kein Butterschmalz, wir brauchen die bindenden Anteile der Butter, kein Reinfett!}, sehr weich oder geschmolzen, aber höchstens handwarm
+    \item 13-14 Eigelbe (ca. 230..250~g)
+\end{itemize}
+
+\subsection*{Zubereitung}
+
+\begin{itemize}
+    \item Mehl, Zucker, Buttervanille und Salz gründlich vermengen. Danach die Butter untermengen und \enquote{verreiben} um ein möglichst gute Verteilung zu gewährleisten. Zuletzt mit den Eigelben zu einem gleichmäßigen Teig verkneten.
+    \item Optional den Teig für mindestens eine halbe Stunde kaltstellen. Das hilft bei beim Ausstechen, da der Teig damit fester wird. Kaltstellen erschwert jedoch auch das Ausrollen.
+    \item Einen Teil des Eiweißes leicht schlagen und vor dem Backen auf die Plätzchen streichen\footnote{Es soll nicht schaumig werden, sondern nur weniger dickflüssig.}. Dies sorgt für eine glänzende Oberfläche.
+    \item Bei 200°C Umluft etwa 10~Minuten backen, bis sie anfangen gold-braun zu werden.
+\end{itemize}
+
+\subsection*{Lagerung}
+
+Die Plätzchen möglichst luftdicht und vor Feuchtigkeit geschützt bei Zimmertemperatur oder leicht kühl aufbewahren. Halten sich erfahrungsgemäß mehrere Wochen.
+
+\end{document}

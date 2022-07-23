@@ -1,0 +1,296 @@
+% !TeX encoding = UTF-8
+% !TeX spellcheck = de_DE_OLDSPELL
+% !TEX TS-program = lualatex
+\ifdefined\directlua\else
+	\errmessage{LuaTeX is required to typeset this document}
+	\csname @@end\expandafter\endcsname
+\fi
+\documentclass[version=last,paper=A4,fontsize=11pt,DIV=18]{scrartcl}
+\usepackage[german]{babel}
+\usepackage{amsmath}
+\usepackage{framed}
+\usepackage{microtype}
+\usepackage[autostyle,german=guillemets]{csquotes}
+\usepackage{url}
+\usepackage[table]{xcolor}
+\usepackage[no-math]{fontspec-luatex}
+\usepackage{mathfont}
+\usepackage{fontawesome}
+\usepackage{luacode}
+%\usepackage{tikz}
+%\usetikzlibrary{tikzmark}
+\setmainfont{TeX Gyre Bonum}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{Source Code Pro}
+\mathfont{TeX Gyre Bonum Math}
+
+%\usepackage{parskip}
+%\usepackage{polyglossia}
+%\setmainlanguage{german}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5\baselineskip plus2pt minus2pt}
+\newenvironment{nscenter}
+{\parskip=0pt\par\nopagebreak\centering}
+{\par\noindent\ignorespacesafterend}
+
+\begin{luacode*}
+    weekdays = {
+        [1] = "Montag",
+        [2] = "Dienstag",
+        [3] = "Mittwoch",
+        [4] = "Donnerstag",
+        [5] = "Freitag",
+        [6] = "Samstag",
+        [7] = "Sonntag",
+    }
+    jan1900 = { ["name"] = "Januar 1900",  ["first"] =  1, ["last"] = 31, ["offset"] = 0 }
+    feb1900 = { ["name"] = "Februar 1900", ["first"] =  1, ["last"] = 28, ["offset"] = 3 }
+    jan1901 = { ["name"] = "Januar 1901",  ["first"] =  1, ["last"] = 31, ["offset"] = 1 }
+
+    function fill_month_row(dnum, month)
+        for week = 1, 5 do -- allotted amount of weeks per month
+            tex.sprint([[ & ]])
+            mday = (week - 1) * 7 + dnum - month.offset
+            if mday >= month.first and mday <= month.last then
+                tex.sprint([[ \texttt{]] .. mday .. [[} ]])
+            end
+        end
+    end
+
+    function fill_calendar_rows(months)
+        -- Go through weekdays
+        for dnum, wday in ipairs(weekdays) do
+            daynum = dnum % 7
+            tex.sprint(wday .. [[ & \texttt{\textbf{]] .. daynum .. [[}} ]])
+            for mnum, month in ipairs(months) do
+                fill_month_row(dnum, month)
+            end
+            tex.print([[ \\ ]])
+        end
+    end
+
+    function fill_calendar(months)
+        colspec = ""
+        for i = 1, #months do
+            colspec = colspec .. " c c c c c"
+        end
+        tex.print{
+            [[\rowcolors{2}{lightgray}{}]],
+            [[\begin{tabular}{ | l c ]] .. colspec .. [[| }]],
+            [[\hline]],
+            [[{\faCaretDown} Wochentage]],
+            [[& $N_T$]],
+        }
+        for mnum, month in ipairs(months) do
+            fmtspec = "c"
+            if mnum == #months then
+                fmtspec = fmtspec .. "|"
+            end
+            tex.print([[& \multicolumn{5}{]] .. fmtspec .. [[}{]] .. month.name .. [[}]])
+        end
+        tex.print{
+            [[\\]],
+            [[\hline]],
+        }
+        fill_calendar_rows(months)
+        tex.print{
+            [[\hline]],
+            [[\end{tabular}]],
+        }
+    end
+\end{luacode*}
+
+\begin{document}
+\section*{Wochentag anhand des Datums\footnote{... nach dem gregorianischen Kalender.} im Kopf berechnen}
+
+Die Methode zur Wochentagsberechnung im Kopf, anhand des Datums, benötigt vier Kennzahlen. Bei einem konventionellen Datum benötigen wir, am Beispiel 1815-12-10\footnote{Das Geburtsdatum von Ada Lovelace.}:
+
+\begin{framed}
+\begin{nscenter}
+    \[\underbrace{18}_{J_h}\underbrace{15}_{J_z}-\underbrace{12}_{M}-\underbrace{10}_{T}\]
+\end{nscenter}
+
+Aus diesen Einzelteilen lassen sich dann berechnen:
+
+\begin{itemize}
+    \item \makebox[10em][l]{\textbf{Tagesziffer}} $N_T = T \bmod 7$
+    \item \makebox[10em][l]{\textbf{Monatsziffer}} $N_M$ (0, 3, 3, 6, 1, 4, 6, 2, 5, 0, 3, 5)
+    \item \makebox[10em][l]{\textbf{Jahresziffer}} $N_{Jz} = (J_z + (\lfloor J_z \div 4 \rfloor) \bmod 7$
+    \item \makebox[10em][l]{\textbf{Jahrhundertziffer}} $N_{Jh} = (3 - (J_h \bmod 4)) \times 2$
+\end{itemize}
+\end{framed}
+
+\begin{framed}
+\textbf{Einschub:} Für die Berechnung benötigen wir ein Konzept, welches zwar den meisten bekannt ist, aber keinen mathematischen Operator im üblichen Sinn besitzt: Modulo, die Ermittlung des Restes einer ganzzahligen Division. Ab und an wird der Operator \enquote{$\bmod$} benutzt und ansonsten gibt es die Gaußklammer $\lfloor \cdot \rfloor$, welche die Nachkommastellen \enquote{abschneidet}.
+
+Für die \emph{ganzzahlige} Division von $a$ durch $b$ erhalten wir so den Ausdruck $\lfloor a \div b \rfloor$. Anwendungsbeispiel: $7 \div 2 = 3,5$, somit ist $\lfloor 7 \div 2 \rfloor = 3$. Daraus kann man wiederum den Rest berechnen, welcher sich aus der Subtraktion des Produkt unseres Ergebnisses ($= 3$) mal ursprünglichem Teiler ($= 2$) vom ursprünglichen Dividenden ($= 7$) ergibt. Wir erhalten also einen Rest $1$: $\lfloor 7 \div 2 \rfloor = 3 \rightarrow 7 - \lfloor 7 \div 2 \rfloor \times 2 = 7 - 6 = 1$, oder kurz: $7 \bmod 3 = 1$.
+\end{framed}
+
+\subsection*{Tagesziffer ($N_T$): Herleitung anhand des Ausgangsdatums 1900-01-01}
+
+Der 1. Januar 1900 war ein Montag eignet sich daher bestens zur Veranschaulichung der Rechenregel für die Tagesziffer. In der Tabelle sind die Zeilen hierbei so angeordnet, daß gleiche Wochentage auf der gleichen Zeile erscheinen.
+
+\begin{center}
+    \directlua{ fill_calendar({ [1] = jan1900, [2] = feb1900 }) }
+\end{center}
+
+Der Sonntag hat eine Sonderrolle, da wir den Tagen im Monat Zahlen ab eins vergeben, aber der Rest von sieben durch sieben null ist. Man kann hier wahlweise null oder sieben \emph{denken}.\marginpar{\faLightbulbO}
+
+Dabei fällt auf, daß sich die Werte auf jeder Zeile -- innerhalb eines Monats -- von Spalte zu Spalte um je sieben Tage -- d.h. eine volle Woche -- unterscheiden. Wichtig für unsere Methode ist aber nur die hervorgehobene Spalte. Zahlen größer als sieben führen wir durch den Rest aus der ganzzahligen Division durch sieben\footnote{Im Kopf kann man bspw. solange sieben abziehen, bis man auf einen Wert zwischen 0 und 6 kommt.} auf eine Zahl zwischen 0 und 6 zurück. Die allgemeine Form der Berechnung sieht damit wie folgt aus:
+
+\begin{nscenter}
+    \[
+    \left( \underset{ganzzahlig}{\lfloor T \div 7 \rfloor} = T_d \right) \xrightarrow{\text{Rest}} \left( \left[ \underset{Rest}{T - T_d \times 7} \right] = \left[ \underset{Modulo}{T \bmod 7} \right] = N_T \right)
+    \]
+\end{nscenter}
+
+Wir schreiben der Übersichtlichkeit halber aber $\lfloor T \div 7 \rfloor = T_d \rightarrow N_T$ oder $T \bmod 7 = N_T$.
+
+Beispiel 19. Januar 1900: 19 geteilt durch 7 ergibt den Rest 5: $\lfloor 19 \div 7 \rfloor = 2 \rightarrow 19 - 2 \times 7 = 19 - 14 = 19 \bmod 7 = 5$. Fünf ist praktischerweise auch die Position des Wochentags\footnote{Unsere Zählung beginnt am Sonntag mit der 0, Montag mit der 1 usw.} in unserem Ausgangsdatum: Freitag.
+
+\subsection*{Monatsziffer ($N_M$): Herleitung anhand des Ausgangsdatums 1900-01-01}
+
+Die Monatsziffer ergibt sich basierend auf der oben berechneten Tagesziffer und der Anzahl Tage der vorhergehenden Monate im Jahr. Hierbei werden -- vorerst -- Schaltjahre ignoriert.
+
+Die Monatsziffer stellt quasi eine Korrektur für die Position des Wochentags für den gleichen Tag des Monats\footnote{... beispielsweise \textbf{1.} Januar, \textbf{1.} Februar ... \textbf{1.} Dezember} durch das ganze Jahr hindurch dar. Um dies zu veranschaulichen, hier die obige Tabelle nochmals erweitert.
+
+\begin{center}
+    \rowcolors{2}{lightgray}{}
+    \begin{tabular}{ | l c c c c c c c c c c c c c c c c | }
+        \hline
+        {
+            \faCaretDown} Wochentage
+        & $N_T$
+        & \multicolumn{5}{c}{Januar 1900}
+        & \multicolumn{5}{c}{Februar 1900}
+        & \multicolumn{5}{c|}{Januar 1901}
+        \\
+        \hline
+        \directlua{ fill_calendar_rows({ [1] = jan1900, [2] = feb1900, [3] = jan1901 }) }
+        \hline
+    \end{tabular}
+\end{center}
+
+
+Man erkennt dabei sehr gut, daß der Wochentag für den 1. Februar sich \emph{um exakt drei Tage nach hinten verschoben hat}. Entsprechend ist die drei unsere Monatsziffer für den Februar.
+
+Man kann auch ohne Visualisierung zu dieser Erkenntnis gelangen. Der Januar hat 31 Tage. Da wir die 7 viermal in der 31 unterbringen können, gelangen wir zu einem Rest von drei: $\lfloor 31 \div 7 \rfloor = 4 \rightarrow 3$. Oder anders ausgedrückt: der Rest aus Division der Anzahl Tage im Monat durch 7 Tage (eine volle Woche) ist ausschlaggebend für die Monatsziffer des Folgemonats\footnote{Anzahl der Wochen plus $x$ sollte die Anzahl Tage im Monat ergeben und $x$ ist gesucht.}.
+
+Für die restlichen Monate des Jahres wird die Methode ausgeweitet. Dazu wird die Monatsziffer des aktuellen Monats (bspw. Februar: 3) mit der Anzahl der Tage des aktuellen Monats (bspw. Februar: 28) addiert und die gleiche Berechnungsmethode -- Rest der Division durch sieben -- angewandt. Dadurch erhält man die nächste Monatsziffer. Für März: $\lfloor (3 + 28) \div 7 \rfloor = 4 \rightarrow 3$.
+
+Für April ergibt sich aus der Monatsziffer vom März (3) und der Anzahl Tage im März (31) geteilt durch sieben ein Rest von sechs: $\lfloor (3 + 31) \div 7 \rfloor = 4 \rightarrow 6$.
+
+Für alle Monate durchgerechnet, ergeben sich folgende Monatsziffern. Es ist am einfachsten sich diese einzuprägen, statt sie jeweils im Kopf zu berechnen.
+
+\begin{center}
+    \rowcolors{0}{}{}
+    \begin{tabular}{ | l c | l c | l c | }
+        \hline
+        Monat   & Kennzahl & Monat     & Kennzahl & Monat     & Kennzahl \\
+        \hline
+        Januar  &        0 & Mai       &        1 & September &        5 \\
+        Februar &        3 & Juni      &        4 & Oktober   &        0 \\
+        März    &        3 & Juli      &        6 & November  &        3 \\
+        April   &        6 & August    &        2 & Dezember  &        5 \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection*{Schaltjahre}
+
+Alle vier Jahre ist ein Schaltjahr (bspw. 2004, 2020) und es gibt einen 29. Februar. Weiterhin sind Jahre, die ohne Rest durch 100 teilbar sind, \emph{keine Schaltjahre} (1700, 1800, 1900), sofern sie nicht auch ohne Rest durch 400 teilbar sind (Schaltjahre 1600, 2000).
+
+\subsection*{Jahresziffer ($N_{Jz}$)}
+
+Ein übliches Jahr hat 365 Tage. Das sind exakt 52 Wochen \`a 7 Tage, plus ein Extratag. Wir können also aufgrund der Methode mit dem Rest der Division durch sieben ermitteln, daß sich der Wochentag des 1. Januar 1901 um eins nach hinten verschiebt: es ist ein Dienstag.
+
+Gedanklich ist es am einfachsten sich die 52 Wochen plus ein Extratag einzuprägen, denn volle Wochen können wir einfach \enquote{wegkürzen} und so mit dem einen Extratag rechnen.
+
+Im Jahr 1902 ergibt sich so eine Verschiebung von zwei Wochentagen relativ zu 1900. Sobald wir zum Schaltjahr 1904 gelangen, gilt es aufzupassen. Die Verschiebung relativ zu 1900 beträgt vier Tage \emph{vor dem März} und fünf Tage \emph{ab dem März}.
+
+Hier ist schon das erste Muster erkennbar. Die Jahresziffer repräsentiert die Anzahl Tage, welche als Korrektur benutzt werden müssen. Durch das Wissen um ein Schaltjahr alle vier Jahre, können wir auch berechnen wieviele Schalttage wir zu dieser Korrektur hinzuaddieren müssen.
+
+Nehmen wir beispielsweise 1952, so ergeben sich $J_z = 52$ Tage als Korrektur, zu denen wir $\lfloor 52 \div 4 \rfloor = 13$ weitere Schalttage\footnote{Es ist Absicht, daß hier durch vier und nicht durch sieben geteilt wird. Denn wir ermitteln die Anzahl Schaltjahre bzw. -tage innerhalb einer gewissen Anzahl Jahre.} zählen müssen. Es ergeben sich also $52 + 13 = 65$ Tage.
+
+Aus dieser Zahl können wir wiederum den Rest der Division durch sieben ermitteln und landen bei: $\lfloor 65 \div 7 \rfloor = 9 \rightarrow 2$.
+
+Wer aufgepaßt hat, hat bereits festgestellt, daß wir einmal $J_z$ direkt verwendet haben und einmal $\lfloor J_z \div 4 \rfloor$. Das erklärt auch, warum sich die Jahresziffer in einem Rythmus von 28 Jahren wiederholt ($4 \times 7 = 28$).
+
+Die obige Berechnung läßt sich dabei herunterbrechen auf:
+
+\begin{itemize}
+    \item Pro Jahr 1 addieren, pro Schaltjahr 2
+    \item Das geht bis zum Wert 6 und beginnt danach wieder bei 0, weil $7 \bmod 7 = 0$
+    \item Die Ziffern wiederholen sich alle 28 Jahre\\Die Jahresziffern der Jahre 1900, 1928, 1956 und 1984 sind also identisch, analog gilt dies auch für 1901, 1929, 1957 und 1985.
+\end{itemize}
+
+\subsection*{Beispielrechnung: Tag des Attentats auf John F. Kennedy}
+
+Kommen wir nun zu dem Datum des Attentats auf John F. Kennedy: 1963-11-22. Wir erhalten folgende Kennzahlen:
+
+\begin{enumerate}
+    \item Jahresrest: 63
+    \item Monat November und daher die Monatskennzahl: 3
+    \item Tag des Monats: 22 ... hier kann man je nach Vorliebe die Zahl direkt nehmen oder den Rest zu vollen Wochen: $22 \div 7 = 3 \rightarrow 1_{Rest}$
+\end{enumerate}
+
+Daraus ergibt sich folgende Berechnung:
+
+\begin{itemize}
+    \item Anzahl Jahre seit vollem Jahrhundert $63 + 63 \div 4 = 15$, also die Schalttage aus den 15 dazwischenliegenden Schaltjahren. In Summe also $63 + 15 = 78$ \emph{Korrekturtage}.
+    \item Ein kurzer Blick zeigt, daß 63 nicht durch vier teilbar ist und auch ansonsten \emph{kein Schaltjahr} sein kann. Ohnehin liegt der November nach dem Februar, so daß ein potentieller Schalttag bereits einbezogen wäre.
+    \item Dazu haben wir noch die Monatskennzahl 3 für November.
+    \item Und zu guter letzt haben wir den 22. Tag des Monats.
+\end{itemize}
+
+Daraus ergibt sich folgende Berechnung:
+\begin{center}
+$63_{Jahresrest} + 15_{Schalttage\:in\:63\:Jahren} + 22_{Tag\:im\:Monat} + 3_{Monatskennzahl} = 103$
+\end{center}
+
+Daraus ergibt sich durch $103 \div 7 = 14 \rightarrow 5_{Rest}$ ein Rest von fünf und damit sollte es ein Freitag gewesen sein. Ein kurzer Blick in eine Enzyklopädie gibt uns recht.
+
+Man kann sich die Einzelschritte übrigens erleichtern, indem man die Division durch sieben mit Rest auf die Einzelwerte anwendet. Wir können also ermitteln: $63 \div 7 = 9 \rightarrow 0_{Rest}$, sowie $15 \div 7 = 2 \rightarrow 1_{Rest}$ und $22 \div 7 = 3 \rightarrow 1_{Rest}$ und die Monatskennzahl 3 liegt bereits im Bereich $0..6$.
+
+Versuchen wir es mit JFKs Geburtsdatum: 1917-05-29. So kommen wir auf:
+\begin{center}
+    $17_{Jahresrest} + 4_{Schalttage\:in\:17\:Jahren} + 29_{Tag\:im\:Monat} + 1_{Monatskennzahl} = 51$
+\end{center}
+
+Und durch die bekannte Division durch sieben kommen wir zum Rest zwei: $51 \div 7 = 7 \rightarrow 2_{Rest}$ und somit einem Dienstag\footnote{Es gibt Webseiten wie \url{https://www.calculator.net/day-of-the-week-calculator.html} welche uns beim Nachprüfen helfen können.}.
+
+\subsection*{Noch nicht die ganze Wahrheit. Neue Beispielrechnung: Lise Meitner}
+
+Geboren am 1878-11-07 und gestorben am 1968-10-27, haben wir folgende Berechnung:
+
+\begin{center}
+    $78_{Jahresrest} + 19_{Schalttage\:in\:78\:Jahren} + 7_{Tag\:im\:Monat} + 3_{Monatskennzahl} = 107$
+\end{center}
+
+Es ergibt sich damit ein Rest von zwei: $107 \div 7 = 15 \rightarrow 2_{Rest}$. Also ein Dienstag?
+
+Leider nein. Hätten wir den Wochentag zum einhundertsten Jahrestag von Lise Meitners Geburtstag berechnet, wäre Dienstag die korrekte Antwort. Aber da wir in den 1800ern unterwegs sind, ergibt sich auch hier eine Verschiebung.
+
+Für den Todestag jedoch, funktioniert unsere Methode auch weiterhin:
+\begin{center}
+    $68_{Jahresrest} + 17_{Schalttage\:in\:68\:Jahren} + 27_{Tag\:im\:Monat} + 0_{Monatskennzahl} = 112$
+\end{center}
+
+Es ergibt sich damit ein Rest von null: $112 \div 7 = 16 \rightarrow 0_{Rest}$. Wie bereits einleitend angemerkt, entspricht die $0$ dem Wert $7$ und damit einem Sonntag.
+
+Zurück zum Geburtsdatum. Der 1878-11-07 war ein Donnerstag. Wie ermittelt man nun aber die Verschiebung? Im Abschnitt zu den Schaltjahren hatten wir festgestellt, daß Jahre die auf 00 enden alle 400 Jahre Schaltjahre sind und ansonsten nicht. Dazu gibt es die Jahrhundertziffer.
+
+\subsection*{Jahrhundertziffer ($J_h$)}
+
+%% TODO
+
+%%Abraham Lincoln April 14, 1865
+%%Ada Lovelace
+
+% Quellen:
+% Mind Performance Hacks (Ron Hale-Evans)
+% In 7 Tagen zum menschlichen Kalender (Jan van Koningsveld)
+% https://de.wikipedia.org/wiki/Wochentagsberechnung#Algorithmus
+
+\end{document}
