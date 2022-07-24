@@ -1,0 +1,133 @@
+\documentclass[version=last,fontsize=11pt,paper=A4,DIV=18]{scrartcl}
+\usepackage{amsmath}
+\usepackage{luaotfload}
+\usepackage{fontspec}
+\usepackage{microtype}
+\usepackage{polyglossia}
+\usepackage{tabularray}
+\usepackage{multicol}
+\usepackage{xcolor}
+%\usepackage{lua-visual-debug}
+\setmainlanguage{english}
+\setmainfont{TeX Gyre Bonum}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{TeX Gyre Cursor}
+
+\definecolor{pastelgray}{rgb}{0.81, 0.81, 0.77}
+
+\NewTblrEnviron{tblrunitconv}
+\SetTblrInner[tblrunitconv]{
+    hline{1-2}  = {1pt,solid},
+    row{odd}    = {bg=},
+    row{even}   = {bg=pastelgray},
+    row{1}    = {font=\bfseries,bg=,},
+    rows        = {abovesep=1pt,belowsep=1pt,m},
+}
+
+\NewTblrEnviron{tblrunitconv2}
+\SetTblrInner[tblrunitconv2]{
+    hline{1-3}  = {1pt,solid},
+    row{odd}    = {bg=pastelgray},
+    row{even}   = {bg=},
+    row{1,2}    = {font=\bfseries,bg=,},
+    rows        = {abovesep=1pt,belowsep=1pt,m},
+}
+
+\NewTblrEnviron{tblroven}
+\SetTblrInner[tblroven]{
+    hline{1-3}  = {1pt,solid},
+    row{odd}    = {bg=pastelgray},
+    row{even}   = {bg=},
+    row{1,2}    = {font=\bfseries,bg=,},
+    rows        = {abovesep=1pt,belowsep=1pt,m},
+}
+
+\begin{document}
+\thispagestyle{empty}
+\section*{Unit conversions}
+
+\begin{minipage}[t][9.5cm][t]{\textwidth}
+    \centering
+    \begin{multicols}{2}
+        \begin{tblrunitconv2}{r|l}
+        % volume
+        \SetCell[c=2]{c} Volume (dry) \\
+        US & metric \\
+        1~tsp & 5~ml \\
+        1~tbsp & 15~ml \\
+        1~fluid oz. & {$\approx$\,30~ml\\(29.57~ml)} \\
+        1/5~cup & 50~ml \\
+        1/4~cup & 60~ml \\
+        1/3~cup & 80~ml \\
+        1/2~cup & 120~ml \\
+        2/3~cup & 160~ml \\
+        3/4~cup & 180~ml \\
+        1~cup & 240~ml \\
+        1~pint = 2~cups & 480~ml \\
+        1~quart = 4~cups & 960~ml \\
+        1~gallon = 4~quarts & 3.84~l \\
+        \end{tblrunitconv2}
+
+        \begin{tblrunitconv2}{r|l}
+        % weight
+        \SetCell[c=2]{c} Weight \\
+        US & metric \\
+        1~oz & $\approx$ 28~g (28.35~g) \\
+        1/4~lb & 113~g \\
+        1/3~lb & 151~g \\
+        1/2~lb & 227~g \\
+        1~lb & 454~g \\
+        35~oz & 1~kg \\
+        \end{tblrunitconv2}
+
+        \begin{tblrunitconv}{r|l}
+        \SetCell[c=2]{c} US equivalents \\
+        16~tbsp & 1~cup \\
+        12~tbsp & 3/4~cup \\
+        10~tbsp + 2~tsp & 2/3~cup \\
+        8~tbsp & 1/2~cup \\
+        6~tbsp & 3/8~cup \\
+        1~quart & 2~pints = 4~ cups \\
+        1 tbsp & 3 tsp \\
+        \end{tblrunitconv}
+    \end{multicols}
+\end{minipage}
+
+\centering
+
+\begin{tblrunitconv}{r|cccccc|c}
+    \SetCell[c=8]{c} Weights of common ingredients, in g \\
+    \SetCell[r=2]{c,m,font=\bfseries,bg=}
+    Ingredient & 1 & 3/4 & 2/3 & 1/2 & 1/3 & 1/4 & 2~tbsp \\
+     & \SetCell[c=6]{font=\bfseries} cup & \\
+     \hline[1pt,solid]
+%    Ingredient & 1~cup & 3/4~cup &  2/3~cup & 1/2~cup & 1/3~cup & 1/4~cup & 2~tbsp \\
+
+    Flour (wheat) & 120 & 90 & 80 & 60 & 40 & 30 & 15 \\
+    Sugar, granulated & 200 & 150 & 130 & 100 & 65 & 50 & 25 \\
+    Brown sugar & 180 & 135 & 120 & 90 & 60 & 45 & 23 \\
+    Corn meal & 160 & 120 & 100 & 80 & 50 & 40 & 20 \\
+    Corn starch & 120 & 90 & 80 & 60 & 40 & 30 & 15 \\
+    Rice, uncooked & 190 & 140 & 125 & 95 & 65 & 48 & 24 \\
+    Table salt & 300 & 230 & 200 & 150 & 100 & 75 & 40 \\
+    Butter & 240 & 180 & 160 & 120 & 80 & 60 & 30 \\
+    Veg. shortening & 190 & 140 & 125 & 95 & 65 & 48 & 24 \\
+    Bread crumbs, dry & 150 & 110 & 100 & 75 & 50 & 40 & 20 \\
+\end{tblrunitconv}
+
+\vspace*{1em}
+
+\begin{tblrunitconv2}{c|cc}
+    \SetCell[c=3]{c} Oven temperatures \\
+    Oven mark & °\,F & °\,C \\
+    \#1 & 275 & 140 \\
+    \#2 & 300 & 150 \\
+    \#3 & 325 & 165 \\
+    \#4 & 350 & 180 \\
+    \#5 & 375 & 190 \\
+    \#6 & 400 & 200 \\
+    \#7 & 425 & 220 \\
+    \#8 & 450 & 230 \\
+\end{tblrunitconv2}
+
+\end{document}
