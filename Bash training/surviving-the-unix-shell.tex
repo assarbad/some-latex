@@ -1,0 +1,1637 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% Surviving the Unix Shell.
+%%%
+%%% WARNING: compile with LuaLaTeX only!
+%%%
+%%% CC0 Oliver Schneider (assarbad.net), 2015, 2020, 2023
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\mytitle}{Surviving the Unix Shell with Bash}
+\newcommand{\myemail}{oliver@assarbad.net}
+\newcommand{\myself}{Oliver Schneider}
+\documentclass{olli-handout}
+
+\begin{document}
+\maketitle
+
+\chapter{Preface}
+
+\section{What's Unix and why learn Bash?}
+
+Unix is a category of operating systems going back to the 1960s\footnote{Also see the glossary.}. The common property shared by all Unixes\footnote{Sometimes Unices or \textasteriskcentered{}nix.} is the programming interface. It allows for programs originally written for one Unix flavor to be easily ported to another Unix flavor. Porting is the process of adapting the program source code\footnote{The human-readable -- well most of the time -- form of a program.} to run on another platform or architecture.
+
+Bash is probably among the top five of popular of the shells on Unix. Bash and its contender -- Zsh -- share a lot of syntax, so learning Bash will get you jump-started with Zsh as well.
+
+\subsection{\ldots{} yeah, but \emph{what for}?}
+
+Using a Unix shell is the prerequisite when using many Unix flavors. If your graphical user interface stops working, you will get dropped into a shell and that seemingly daunting shell prompt will be the straw that lets you rescue your system.
+
+Being able to write Bash scripts on will get you started expressing your intentions in a way to automate even complex tasks.
+
+\textbf{Examples:} showing the disk space occupied by a particular file type; renaming whole folder hierarchies with documents to better match your needs; automating the installation of a system; automating software builds; automating web application deployments.
+
+Last but not least it is simply cool to know a little bit about programming, because it gives a better sense about the automation potential in many drudging tasks.
+
+\section{Preliminary remarks}
+
+Feel free to get in touch with me via email to \mailto{oliver}.
+
+\begin{hintbox}
+    {\olliHandLeft} Many of the concepts in this booklet do not just apply to Bash, they also apply to a range of other shells and have been reused in other places, e.g. shell globbing.
+\end{hintbox}
+
+If you are reading this at a computer screen, please look out for the navigation features of this document. There may be a pane on the left or right side which lets you jump between topics. ``\olliDownload'' can be clicked to download the respective \emph{embedded} file\footnote{Yep, each embedded file is part of the document. No browser required.}.
+
+\subsection{Notation used}
+
+Command lines you can try appear in a teletype typeface \termcmd{like this}. Command lines along with the output they are expected to generate will look like this; line numbers on the left:
+
+\begin{lstbash}
+user@host:~$ echo foo bar
+foo bar
+user@host:~$ echo and really really long lines like this one will break and an arrow on the next line will denote the fact
+\end{lstbash}
+
+When in-lined, the {\term} is there to remind you that you should or would type this at the prompt. Of course you type the command between the double quotes, not the {\term}. In the listing about the part that you type would be what appears \emph{after} the \TTQ{\mytilde\textdollar}.
+
+Output or other plain text will appear with fixed-width typeface in their own paragraph:
+
+\begin{GenericListing}
+like this
+\end{GenericListing}
+
+Furthermore ``{\olliHandLeft}'' is meant to draw your attention to a particular detail or a summary of surrounding text. Additionally ``{\olliPenRD}'' and ``{\olliPenR}'' point you to \emph{newly introduced commands} and information about the \emph{syntax or use of a command} respectively.
+
+Links to external websites will appear like so \extlink{https://windirstat.net}{windirstat.net}, links to Wikipedia like so \wplink{https://en.wikipedia.org/wiki/Wiki}{Wiki} and mail addresses like so \mailto{john.doe}.
+
+If you need to press certain keys, the notation will be \keys{\enter} or \keys{\ctrl+C} and similar.
+
+\subsection{Miniature glossary -- terms you should know}
+
+You can come back here at a later point when in need. If you decide to skip now, please have a look at the terms in bold such that you will know you can find them here when they come up.
+
+\begin{description}
+	\item[bug] the term \wplink{https://en.wikipedia.org/wiki/Software_bug}{bug} has been used in computer programming for decades. Since you may hear me utter it, I want to make sure you understand. Normally it refers to the defect in a program, but it may also refer to the symptom \emph{caused} by the defect. The term allegedly originates from moths and other insects that could prevent contact in relay switches of old computers. Generally I prefer the term defect.
+	\item[folder and directory] will be used interchangeably in this text. The meaning is a container for other folders and for files. Folder alludes to the computer desktop being the electronic counterpart to what is on a desk, e.g. folders.
+    \item[literals] a literal or ``literal value'' is for example a text string like ``Hello world!'' or a number like $42$. That is opposed to variables which may take arbitrary values.
+	\item[variable] remember your math classes? Consider $2x^2 = y$. The teacher might have asked something along the lines of ``for $x = 4$ what is the value of $y$?'' Both $x$ and $y$ are \emph{variables} in that case; where $x$ and $y$ respectively are the variable names and $4$ would be the value of $x$ in the above exercise.
+    \begin{itemize}
+        \item[\olliHandLeft] a \emph{variable} is a symbolic name that can take a variety of values.
+    \end{itemize}
+	\item[Bash] an acronym and pun ``\textbf{B}ourne-\textbf{A}gain \textbf{sh}ell''. The Bourne shell (\namecmd{sh}), named after Stephen Bourne, was the default shell on Unix Version 7. In a sense the Bourne shell defines the minimum capabilities of Unix shells even today.
+	\item[CLI] short for ``Command Line Interface''
+	\item[GUI] short for ``Graphical User Interface''
+	\item[Scripting] is the process of writing scripts. There are plenty of scripting languages and Bash is one of them.
+	\item[Text terminal, Terminal] in the scope of this booklet the visual representation of the character based terminal, which we can see through a \emph{terminal emulator}.
+	\item[TTY] originally for teletypewriter, a device used to transmit text electronically. Today the software facility\footnote{usually provided by the operating system} which we connect to with a terminal emulator.
+	\item[Unix] is the generic term for operating systems (``platforms'') ranging from Linux and Mac OSX to Solaris, AIX, FreeBSD and many, many more. What they all have in common is their programming interface, which allows a program written for one system to be built for another easily.
+\end{description}
+
+For console, terminal and TTY also see \extlink{https://unix.stackexchange.com/a/4132}{\faStackExchange{} this explanation}.
+
+\chapter{Introduction to interactive Bash}
+
+\section{What is in a shell?}
+
+A shell is a standardized user interface that allows one to
+
+\begin{itemize}
+	\item run programs
+	\item interact with the computing environment in a variety of ways
+\end{itemize}
+
+\subsection{Types of shells}
+
+There are GUI-based shells and CLI-based shells, for example:
+
+\begin{description}
+	\item[GUI-based] Windows Explorer, OSX Finder
+	\item[CLI-based] \namecmd{bash}, \namecmd{csh}, \namecmd{ksh}, \namecmd{zsh}, Windows Command Prompt
+\end{description}
+
+\begin{hintbox}
+    {\olliHandLeft} We will focus on CLI-based shells here. In particular on those that can commonly be found on Unix systems.
+
+    Bash, the subject matter of this booklet, runs essentially on all Unix platforms.
+\end{hintbox}
+
+\section{Meet the terminal}
+
+When not configured, the shell will greet you something similar to this:
+
+\begin{lstbash}
+user@host:~$ _
+
+\end{lstbash}
+
+\begin{hintbox}
+    {\olliHandLeft} The part before the text cursor seen above is called a \emph{shell prompt}. It prompts you to enter one or multiple \emph{commands}; a command line.
+
+    The underscore (\TTQ{\textunderscore}) denotes the \emph{text cursor} and may blink, depending on your terminal emulator settings. It may also look like a solid block or like a vertical line (\TTQ{\textbar}).
+\end{hintbox}
+
+\subsection{Our first command}
+
+It is customary when learning a new programming language, to write a small program that outputs ``Hello world!''. So here we go. Type the part after the \TTQ{\textdollar\textvisiblespace} into your terminal:
+
+\begin{lstbash}
+user@host:~$ echo 'Hello world!'
+\end{lstbash}
+
+after pressing \keys{\enter} you should get to see something very closely resembling this:
+
+\begin{lstbash}
+user@host:~$ echo 'Hello world!'
+Hello world!
+user@host:~$ _
+\end{lstbash}
+
+\begin{hintbox}
+    {\olliPenR} A command line is comprised of the at least one command and optionally its arguments. In the above example \namecmd{echo} was the command and \TTQ{Hello world!} the only argument passed.
+
+    {\olliHandLeft} The double quotes around \Arg{Hello world!} merely grouped the text into a single argument. For \namecmd{echo} it would not have made a difference, but \emph{quoting} is a concept we will get to. It is possible and sometimes required to pass multiple arguments.
+\end{hintbox}
+
+\begin{refmanbash}
+\menu[,]{SHELL BUILTIN COMMANDS}
+\end{refmanbash}
+
+\section{Meet the file system with its files and folders}
+
+Depending on your background you may or may not have thought about it. You are probably using \emph{files} already to store away your documents inside \emph{folders} (sometimes also called \emph{directories}).
+
+A file system is the logical structure which is used by the operating system or software to make files available to you. Different operating systems have different approaches to representing folders:
+
+\begin{description}
+	\item[Windows] something like \verb|C:\User\Oliver| may look familiar to you. Or, if you never left the Windows Explorer, perhaps \menu[,]{Computer,Local Disk (C:),Users, Oliver} or \menu[,]{This PC,Local Disk (C:),Users, Oliver} looks more familiar?
+    \begin{itemize}
+        \item[\olliHandLeft] Windows also has the notion of drive letters. This is something you will not get to see on the platforms we will work on.
+    \end{itemize}
+	\item[Linux and other Unix platforms] something like \TT{/home/oliver} \emph{should} look familiar to you by now, if you ever dabbled with Linux and friends.
+    \begin{itemize}
+    	\item[\olliHandLeft] In most Unix systems almost \emph{everything} is a file or folder, even though some are special files. Also, all drives will be \emph{mounted} underneath a single hierarchy.
+    \end{itemize}
+	\item[Mac OSX] unless you open the terminal, the Finder is the only thing that shows you files and folders in some form.
+    \begin{itemize}
+        \item[\olliHandLeft] Technically Mac OSX \emph{is} a Unix, so read the respective remark above.
+    \end{itemize}
+\end{description}
+
+\subsection{Meet \TT{/}}
+
+The so-called \emph{path separator} on a Unix system is \TT{/}, i.e. a forward slash. Incidentally this is also how \emph{absolute paths} begin and it is the way to refer to the ``root'' of the file system and the start of the \extlink{https://refspecs.linuxfoundation.org/fhs.shtml}{folder hierarchy}.
+
+For example my home folder on a Linux system will often be \TT{/home/oliver}. That means:
+
+\begin{itemize}
+	\item based in the root of the file system hierarchy
+	\item \ldots{} look for a folder named \TT{home}
+	\item \ldots{} then in turn look for a folder named \TT{oliver} inside of \TT{/home}
+\end{itemize}
+
+The root of a typical Linux system looks like this:
+
+\begin{lstbash}
+user@host:~$ tree -dL 1 /
+/
+|-- bin
+|-- boot
+|-- dev
+|-- etc
+|-- home
+|-- lib
+|-- lib64
+|-- lost+found
+|-- media
+|-- mnt
+|-- opt
+|-- proc
+|-- root
+|-- run
+|-- sbin
+|-- srv
+|-- sys
+|-- tmp
+|-- usr
+`-- var
+\end{lstbash}
+
+\begin{hintbox}
+{\olliPenRD} The \TTQ{tree} command is useful to get a sense for the folder hierarchies, especially when used with the option \emph{option} \TTQ{-d} and limiting it to a given number of folder levels down from the current one, like with option \TTQ{-L 1}.
+
+{\olliPenR} The above command \TTQ{tree -dL 1} is equivalent to \TTQ{tree -d -L 1}.
+\end{hintbox}
+
+\subsection{\texorpdfstring{\mytilde}{Home} sweet \texorpdfstring{\mytilde}{home}}
+
+\begin{refmanbash}
+\menu[,]{EXPANSION,Tilde Expansion}
+\end{refmanbash}
+
+The shell makes certain oft used folders conveniently available to us. The most prominent you already saw is \TTQ{\mytilde}, the tilde\footnote{Use \keys{Alt+N} on a German Mac keyboard (where the key is unlabeled).}, which appeared in the \emph{shell prompt}.
+
+{\olliHandLeft} ``{\mytilde}'' is a \emph{shorthand for your home folder}. If you knew a user account for user \TTQ{joe} exists, you could refer to it using \TTQ{{\mytilde}joe}.
+
+There are two more useful shorthands with the tilde plus special names:
+
+\begin{itemize}
+	\item \TTQ{{\mytilde}+} expands to the \underline{current} \emph{working directory}\footnote{The current working directory is a piece of context information the shell keeps for you. Since commands often act on files inside the current folder, the shell needs to be aware.}
+	\item \TTQ{{\mytilde}-} expands to the \underline{previous} \emph{working directory} after changing directories
+	\item \TTQ{..} refers to the parent folder of the folder we are currently in
+	\item \TTQ{.} refers to the current folder
+\end{itemize}
+
+If you like, play around with them using \termcmd{echo {\mytilde}} and so on\ldots
+
+{\olliHandLeft} We will get back to other ways in which the shell expands certain other entities at a later point.
+
+\subsection{Navigating the file system}
+
+Technically most file systems are case-sensitive\footnote{They distinguish the case of file and folder names, i.e. \TT{abc.txt}, \TT{ABC.txt} are different files.}. However, not all platforms and not all shells treat file and folder names that way. On Linux \textbf{names are case-sensitive}, though.
+
+{\olliHandLeft} This section introduces several commands at once. Pay special attention.
+
+\begin{hintbox}%[breakable=true]
+{\olliPenRD} There are certain file and folder related actions that you will have to use repeatedly on the Unix shell. These include:
+	\begin{description}
+		\item[Listing files and folders] inside the current working directory with \TTQ{ls} -- think \underline{l}i\underline{s}t
+		\item[Changing the current working directory] with \TTQ{cd} -- think \underline{c}hange \underline{d}irectory
+		\begin{itemize}
+			\item[\olliPenR] Remember \TTQ{\mytilde} from before? You can type \TTQ{cd \mytilde} to get into your home folder quickly, but it works \emph{even} quicker by typing just \TTQ{cd}
+			\item[\olliPenR] \TTQ{cd ..} changes to the \emph{parent} folder
+			\item[\olliPenR] \TTQ{cd -} (dash/minus) is a shorthand to switch to the \emph{previous} working directory, i.e. the one before the most recent \TTQ{cd} command.
+		\end{itemize}
+		\item[Switching to a directory] with \TTQ{pushd}, and back with \TTQ{popd}. Or using \TT{pushd} several times and inspecting the resulting ``stack'' of recently visited directories with \TTQ{dirs}.
+		%% DEMO: pushd ... show directory stack ... explain stack briefly (stack of cards, but without cheating)
+	\end{description}
+\end{hintbox}
+
+\subsection{Basic file system modifications}
+
+Of course you cannot just change the current working directory or list files and folders but you can also remove files and folders as well.
+
+\begin{hintbox}%[breakable=true]
+	\begin{description}
+		\item[Removing empty directories] with \TTQ{rmdir}\footnote{This command is \emph{specifically} limited to empty directories.}
+		\item[Creating, i.e. ``making'' new directories] with \TTQ{mkdir}
+		\item[Removing files] with \TTQ{rm} and a single file with \TTQ{unlink}
+		\begin{itemize}
+			\item[\olliPenR] \TT{rm -f ...} forcefully removes files and folders.
+			\item[\olliPenR] \TT{rm -rf ...} forcefully removes files and folders \emph{recursively}\\
+            \textbf{Attention: that can be \underline{dangerous!}}\\
+            To be more cautious add \TT{-I} and \TT{-i} to have \TT{rm} prompt you.
+		\end{itemize}
+		\item[Copying and moving files or folders] with \TT{cp} and \TT{mv} respectively
+		\begin{itemize}
+			\item[\olliPenR] If the target folder name ends in a \TT{/} (slash), the source files and folders will be copied or moved under their current name.
+		\end{itemize}
+	\end{description}
+\end{hintbox}
+
+{\olliHandLeft} As a Windows user who has used the \emph{Windows Command Prompt} before, it is good to know that most modern Linux systems provide a \TT{dir} command, too. \TT{vdir} gives you a vertical listing similar to \TT{ls -l}.
+
+\subsection{Hidden .files and .folders?}
+
+By \emph{convention} Unix treats file and folder names with a leading dot as \emph{hidden}. This affects most notably the \TT{ls} command, which by default will not show these hidden files and folders.
+
+\begin{hintbox}
+{\olliPenR} Pass option \TT{-a}, i.e. \TT{ls -a}, to include \textbf{a}ll files.
+\end{hintbox}
+
+\subsection{Executable folders?}
+
+If you have paid attention and played around with \TT{ls -l}, you may have come across lines like these:
+
+\begin{lstbash}
+-rw-r--r-- 1 oliver oliver      7347 2015-05-06 20:35 temp.log
+drwxr-xr-x 1 root   root        4096 2015-05-07 19:35 temp
+-rw-r----- 1 oliver root        7347 2015-05-06 20:31 old.log
+\end{lstbash}
+
+The meaning of the first ten characters, e.g. \TT{drwxr-xr-x}, is a terse notation of the traditional Unix file permission for owner, group and others (or ``world'') respectively, with the first character taking the exception here. On line 2 you can see the \TT{d} for directory and on line 1 \TT{-} denoting a regular file.
+
+The most important shorthand letters are: \underline{r}ead, \underline{w}rite and e\underline{x}ecute. There are others and you can find them in the documentation for the command \TT{chmod}\footnote{How to find help concerning a given command will be discussed shortly.}.
+
+The items \TT{oliver oliver} and \TT{root   root} refer to the owner and group respectively\footnote{A number may be shown here instead of a user or group name, if the files were received from another system and no local users with the respective numeric IDs exist locally.} -- they can differ at times, as shown in line 3.
+
+After that follows the size, the date and time and the name of the file or folder.
+
+\begin{hintbox}
+{\olliHandLeft} So why does the directory on line 2 have the execute permission enabled? The reason is that some of these permission flags are context-sensitive. For a file the \TT{r} means being allowed to read it, for a directory it means being allowed to list it. Similarly \TT{x} means you can execute a file as a program\footnote{\ldots{} or script; we'll get there!} and that \emph{you are allowed to change into a directory}.
+
+{\olliPenRD} The \TT{stat} command offers an even better look at files and folders. Give it a try!
+\end{hintbox}
+
+\section{Environment and other variables}\label{env_vars}
+
+\begin{refmanbash}
+\menu[,]{EXPANSION,Parameter Expansion}
+\end{refmanbash}
+
+When you start your shell, the system settings and perhaps your own user setting govern the availability of a range of \emph{environment variables}.
+
+\begin{hintbox}
+{\olliHandLeft} Each and every started program\footnote{i.e. process} has a so-called environment block. A list of key/value pairs that together form the environment variables of a process. These influence the program behavior in a variety of ways.
+
+Environment variables are inherited by child processes, i.e. system commands or scripts you run, when these child processes start.
+
+One popular change is the search path (\TT{PATH}\label{path_var} variable) or the language (\TT{LANG} variable). Another oft used variable is \TT{HOME}, whose contents are usually in sync with \TT{\mytilde}. However, remember that the tilde is a Bashism\footnote{i.e. specific to Bash and a handful other shells, but not universally recognized.}, whereas the \TT{HOME} variable is more universal.
+\end{hintbox}
+
+As a demonstration make sure that on your system the \TT{LANG} variable contains ``UTF-8''.
+
+\begin{lstbash}
+user@host:~$ env|grep LANG
+LANG=en_US.UTF-8
+\end{lstbash}
+
+The output should contain something with \TT{UTF-8} in it. Now test the previously used \TT{tree} command again exactly as before: \termcmd{tree -dL 1 /}. Then repeat the same exercise, but after adjusting the command as follows: \termcmd{LANG=C tree -dL 1 /}. Do you notice the difference? Another two programs affected by \TT{LANG} are \TT{date} and \TT{time}.
+
+As you can hopefully see the environment variables can affect greatly the outcome of running a command. This is why they are so important.
+
+Bash also has a few variables that influence its behavior. Use \termcmd{help variables} to find out more about them.
+
+\subsection{Meet \TT{env}}\label{env_cmd}
+
+The \TT{env} program is a versatile tool. But its most obvious effect is to show you the currently effective environment variables. The way this works is that \TT{env}, as described above, inherits the current process' environment variables and simply shows them.
+
+If you set a variable that is local to your shell session using \termcmd{X=value} that value will not be shown by \TT{env}. However, if you export your variable with \termcmd{export X}, \TT{env} will list it.
+
+For convenience Bash also allows to export and assign in one step: \termcmd{export X=value}\footnote{Strictly speaking this should be considered a Bashism, but except on the Solaris \TT{sh} this seems to be universally available.}.
+
+To simply display a local or environment variable, use the previously seen \TT{echo} command:
+
+\begin{lstbash}
+user@host:~$ echo $X
+value
+\end{lstbash}
+
+To unset a local or environment variable, simply use \termcmd{unset X}.
+
+{\olliHandLeft} We will meet variables again in some more detail when we are discussing shell scripts.
+
+\section{Bash and the keyboard}
+
+\begin{refmanbash}
+    \menu[,]{READLINE}
+\end{refmanbash}
+
+Undoubtedly by now you will have noticed that the invocation of commands requires a whole lot of typing. Can we not reduce this a little? And in fact there are several convenient keyboard shortcuts that make life with the shell easier.
+
+Some of the following shortcuts don not just apply to Bash, but to other \TT{readline}-enabled programs as well\footnote{Readline is a library used by many a program these days.}.
+
+\subsection{Tab to complete!}
+
+The importance of \keys{\tab} cannot be understated. Especially when you have the popular package \TT{bash-completion} installed and active, it can save a whole lot of typing.
+
+The feature is called tab completion and allows you to complete partially typed commands or file/folder names and with \TT{bash-completion} even the command line options of programs. The ``magic'' is twofold.
+
+\begin{hintbox}
+{\olliHandLeft} We will revisit tab completion in one of the following sections when we discuss globbing.
+\end{hintbox}
+
+You can press \keys{\tab} once to see whether anything matches the text entered so far unambiguously. If it does, the effect will be that the partially typed text gets completed to, say, the full name of a file.
+
+You can press \keys{\tab} twice to be presented a list of matches so far. Since this can sometimes be a quite big list, over a certain threshold you will be asked to confirm that you want to see all possibilities:
+
+\begin{lstbash}
+user@host:~/csav/download$ ls 20150
+Display all 933 possibilities? (y or n)
+\end{lstbash}
+
+In this case I typed \TT{ls 2} and hit \keys{\tab+\tab}. The natches all start with at least the common text string \TT{20150} and so that was completed and then I was asked to confirm.
+
+Similarly if I type \TT{ls l} and hit \keys{\tab+\tab} I am offered immediately four possible completion candidates and returned back to my prompt.
+
+\begin{lstbash}
+user@host:~/csav/download$ ls l
+latest.v1/  latest.v2/  latest.v2c/ live-tree/
+user@host:~/csav/download$ ls l
+\end{lstbash}
+
+From there I can decide which of the candidates to pick. For example if I continued to type \keys{I} (\TT{i}) to end up with \TT{ls li} and hit \keys{\tab} (once!):
+
+\begin{lstbash}
+user@host:~/csav/download$ ls li
+\end{lstbash}
+
+\ldots{} it would complete to the single available match:
+
+\begin{lstbash}
+user@host:~/csav/download$ ls live-tree/
+\end{lstbash}
+
+{\olliHandLeft} The trailing \TT{/} (slash) in the previous example denotes that this is a folder. During tab completion this is the easiest way to distinguish matching folder candidates from file candidates.
+
+\subsubsection{I hit the tab key once too often!}
+
+Sometimes it just so happens that you press \keys{\tab} twice instead of once and you end up with a handful of completions. In this case you can easily get rid of them by one of the following methods:
+
+\begin{itemize}
+	\item hit \keys{\ctrl+W} to delete one ``word'' backwards -- lather, rinse, repeat
+	\item hit \keys{\ctrl+A} to delete backwards to the beginning of the line
+	\item hit \keys{\ctrl+C} to cancel the current line and return to a fresh prompt
+\end{itemize}
+
+\subsection{More shortcut goodness}
+
+In the previous section you already learned of \keys{\ctrl+C}. That shortcut is also a command of last resort when a long running command appears to hang or you simply want to cancel it.
+
+Technically when pressing \keys{\ctrl+C} the shell, which is the parent process to any command you invoke\footnote{There are ways to disown a child process, but that is an advanced topic.}, the shell will send a signal to the child process which normally results in that process getting killed.
+
+Hitting \keys{\ctrl+D} will send an end-of-file to the terminal. This has several meanings, dependent on the context, but if you hit it on an empty shell prompt, the effect is pretty much identical to issuing an \termcmd{exit}. The shell exits and if it was the only one the terminal emulator exits along with it.
+
+By default the \keys{\ctrl+L} shortcut will ``clear'' your terminal. This is equivalent to the Bash builtin \termcmd{clear}. All it really does is to set your prompt to the first line of the terminal. It does not affect the scrollback buffer or the Bash history.
+
+\subsection{Navigating the Bash history}\label{bash_history}
+
+\begin{refmanbash}
+\menu[,]{READLINE,Commands for Manipulating the History}
+\end{refmanbash}
+
+A record of most issued commands is kept verbatim by Bash. The storage for this record is the Bash history and physically it is normally the file \TT{.bash\_history} in your \TT{\mytilde} folder.
+
+You can list the contents of the Bash history with the \TT{history} builtin command. You may use \termcmd{help history} to find out a little more about the other possibilities with the command.
+
+One thing most Bash users find out by accident or are pointed to shortly after starting with Bash is the use of \keys{\arrowkeyup} to go recall previously typed commands one by one and \keys{\arrowkeydown} to navigate the same list in the other direction.
+
+While you will see me using these shortcuts also, many people do not know about the alternative shortcuts: \keys{\ctrl+P}  and \keys{\ctrl+N} for \underline{p}revious and \underline{n}ext respectively. They mirror the behavior of the cursor keys mentioned above.
+
+But there is more. What if you typed \TT{ls} a lot of times, perhaps dozens of times, since you were listing the folder \TT{gobbledigook}? You would have to sift through pages cluttered with lines all starting with \TT{ls}. Well, fret not. Bash provides \emph{history search} as well:
+
+\begin{itemize}
+	\item hit \keys{\ctrl+R} to \underline{r}everse-search the history, i.e. backward direction
+	\item hit \keys{\ctrl+S} to \underline{s}earch the history, i.e. forward direction
+\end{itemize}
+
+And if you just thought I ran out of selling points of the Bash history, brace yourselves. You can recall the previous command using two exclamation marks, colloquially known as bang bang: \TT{!!}.
+
+This is particularly useful if you are -- as you should be -- running as an unprivileged user and forgot to run a command with \TT{sudo}\footnote{a privileged command that allows to commands as another user, most usually as superuser.}. Simply enter the command \termcmd{sudo !!} and you're golden.
+
+\begin{refmanbash}
+\menu[,]{HISTORY EXPANSION}
+\end{refmanbash}
+
+\section{Shell globbing and brace expansion}
+
+\begin{refmanbash}
+\menu[,]{EXPANSION,Pathname Expansion}
+\end{refmanbash}
+
+\emph{Shell globbing} or \emph{pathname expansion} is a a way to match file and folder names using wildcard expressions. If you want to learn all the gory details, I will refer you to the Bash documentation as the behavior is also influenced by several shell options.
+
+However, we will discuss the most important facts about wildcards here. All of these wildcard expressions can appear not at all, once or multiple times.
+
+\begin{description}
+	\item[Asterisk or star:] \TT{*} matches one or more characters\footnote{but the exact behavior is influenced by the set shell options}
+	\item[Question mark:] \TT{?} matches exactly any single character
+	\item[Bracket expressions:] using \verb|[...]| it is possible to match any single character, where the character must be one from the set given inside the brackets
+\end{description}
+
+\begin{hintbox}
+{\olliHandLeft} Tab completion also makes use of shell globbing. So when you use the wildcard expressions explained here, hitting \keys{\tab} will expand matches according to the explained rules.
+
+{\olliHandLeft} Furthermore if an expression \emph{does not match}, the outcome is normally that the wildcard expression \emph{does not expand} and is passed to a command as is. However, the shell options \TT{nullglob} and \TT{failglob} affect this behavior.
+\end{hintbox}
+
+\subsection{Escaping}
+
+\begin{refmanbash}
+\menu[,]{QUOTING}\footnote{This is not a mistake, the section to consult is ``QUOTING''.}
+\end{refmanbash}
+
+As unusual as it sounds, sometimes you need to match the wildcard characters \emph{literally} instead of having them expanded. In such a case use \TT{\textbackslash} (backslash) to \emph{escape}\footnote{Escaping in this case means to escape the usual pathname expansion handling.} the expression.
+
+Say you have a bunch of \TT{.doc} files that have a question mark in their file name right before the \TT{.doc} and you wanted to remove all of them at once, you could try  this:
+
+\begin{GenericListing}
+rm "Business strategy next year?.doc" "Ideas?.doc"
+\end{GenericListing}
+
+or you could look for all files with a question mark before the \TT{.doc}.
+
+\begin{GenericListing}
+rm *\?.doc"
+\end{GenericListing}
+
+\emph{Analysis:} the \TT{\*} matches up to the first literal question mark, \verb|?| matches \emph{the literal} question mark, \TT{.doc} matches literally.
+
+\begin{hintbox}
+    {\olliPenR} Please note that the double quotes in the first example had also the effect to make the question mark literal. It also grouped all the blank space separated words leading up to the file extension. If we had not given the double quotes, we would have had to escape the blank spaces as well, like this:
+
+    \begin{GenericListing}
+    rm Business\ strategy\ next\ year?.doc Ideas?.doc
+    \end{GenericListing}
+\end{hintbox}
+
+\subsection{Pathname expansion in practice}
+
+Let us look at a few examples of pathname expansion a little more. If you want to experiment yourself, I would strongly suggest to use the \TT{echo} command to see how and what Bash expands.
+
+\begin{hintbox}
+\textbf{Question:} So how do Unix systems distinguish file types if not by file extension? There is a tool called \TT{file} which uses a library named \TT{libmagic} to identify files by the leading bytes of their content instead of by file extension.
+\end{hintbox}
+
+\begin{tabularx}{\textwidth}{|l|p{4.5em}|p{4.5em}|X|}
+	\hline expression & match & no match & remarks \\
+	\hline \TT{*} & \emph{all files} & & depending on \TT{dotglob} may skip hidden files \\
+	\hline \TT{.*} &  & & used to match hidden files if \TT{dotglob} is not set \\
+	\hline \TT{*.mp?} & \TT{a.mp3}, \TT{foo.mp4}, \TT{bar.mpg} & \TT{baz.mpeg} & matches \emph{exactly} one character, no less, no more \\
+	\hline \TT{*.mp[4g]} & \TT{foo.mp4}, \TT{bar.mpg} & \TT{a.mp3}, \TT{baz.mpeg} & \\
+	\hline \TT{*/*} & \emph{all files} &  & all files in subfolders \emph{only} \\
+	\hline \TT{* */*} & \emph{all files} &  & files in current folder and subfolders \\
+	\hline \TT{/*/*} & \emph{all files} &  & all files in the whole file system hierarchy \\
+	\hline
+\end{tabularx}
+
+\subsection{Brace expansion}
+
+\begin{refmanbash}
+\menu[,]{EXPANSION,Brace Expansion}
+\end{refmanbash}
+
+A concept that is related to the pathname expansion explained before is the so-called \emph{brace expansion}. The difference is that it does not attempt to match against file or folder names, but instead simply allows to construct a range of values from a single one. Let us see how that works and where it is relevant.
+
+Say you wanted to create a folder hierarchy in the current folder, where the top level folder is called \TT{log}, the second level are the numbers \TT{00} through \TT{99} and inside that the third level should have two folders each, named \TT{system} and \TT{user}.
+
+Since the folders do not exist, pathname expansion cannot be employed here. So you could write an elaborate script or could type out a gazillion repetitive commands. \emph{Or} you could use the very convenient brace expansion.
+
+\begin{lstbash}
+user@host:~$ $ mkdir -p log/{00..99}/{system,user}
+user@host:~$
+\end{lstbash}
+
+\begin{hintbox}
+{\olliPenR} The \TT{mkdir -p ...} form creates all directories, including parent ones that may not exist yet.
+\end{hintbox}
+
+Had I reproduced the output of \TT{tree -d log}, I could fill another few dozen pages. So for brevity let me just show the last fifteen lines of its output\footnote{The pipe character, i.e. the vertical line \TTQ{\textbar} in the command, can be typed using \keys{Alt+7} on a German Mac keyboard (where the key is unlabeled).}:
+
+\begin{lstbash}
+user@host:~$ tree -d log|tail -n 15
+|   `-- user
+|-- 96
+|   |-- system
+|   `-- user
+|-- 97
+|   |-- system
+|   `-- user
+|-- 98
+|   |-- system
+|   `-- user
+`-- 99
+|-- system
+`-- user
+
+300 directories
+user@host:~$
+\end{lstbash}
+
+The ``300 directories'' on summary line 16 tells us that with a single command we just created an elaborate folder hierarchy.
+
+So what happened here? The expression \TT{log/{00..99}/{system,user}} already contains the prevalent basic forms of brace expansion.
+
+\begin{description}
+	\item[Generate a contiguous range] of incrementing of decrementing values with \TT{{00..99}}. This also works for letters such as \TT{{a..z}}.
+	\begin{itemize}
+		\item[\olliPenR] The fact that \TT{00} was used for the start of the range makes Bash expand it to a range of two-digit values from 0 through 99. If we had given \TT{{0..99}} the first ten elements would be one-digit only.
+	\end{itemize}
+	\item[Generate all of a range] of comma-separated values. This can also be combined with the above form like so: \TT{{{a..z},{A..Z}}}.
+\end{description}
+
+So what Bash did internally was to alternate the different path components and create all those folder names before passing them to \TT{mkdir}. Here is an approximation of the process without typing all those names verbatim for \TT{log/{00..99}/{system,user}}:
+
+\begin{GenericListing}
+log/00/system
+log/00/user
+log/01/system
+...
+log/99/system
+log/99/user
+\end{GenericListing}
+
+It can save you a whole lot of typing.
+
+\section{System commands, builtins, aliases}
+
+\begin{refmanbash}
+\menu[,]{SHELL BUILTIN COMMAND}
+\end{refmanbash}
+
+The commands you enter can originate from one of several sources. The most common ones you will encounter will be:
+
+\begin{itemize}
+	\item System commands, that is actual compiled programs as well as scripts
+    \begin{itemize}
+        \item[\olliPenR] Where to search for those is governed by the \TT{PATH} environment variable.
+    \end{itemize}
+	\item Bash builtins, such as \TT{help} or \TT{history}.
+	\item Aliases, see below
+\end{itemize}
+
+To find out what type a particular command has, use the \TT{type} command. Example:
+
+\begin{lstbash}
+user@host:~$ type history
+history is a shell builtin
+user@host:~$ type ll
+ll is aliased to `ls $LS_OPTIONS -l'
+user@host:~$ type grep
+grep is /bin/grep
+user@host:~$
+\end{lstbash}
+
+Here you can see that, perhaps surprisingly, \TT{ls} is not a system command, but rather an alias that passes the value of environment variable \TT{LS\_OPTIONS} to the actual \TT{ls} system command.
+
+\subsection{Aliases}
+
+\begin{refmanbash}
+\menu[,]{ALIASES}
+\end{refmanbash}
+
+Aliases are a convenience feature. They allow us to do less typing by creating our personal shorthands for oft used commands.
+
+For example I prefer to see all files always when listing folder contents, including hidden ones. I also prefer the long format with one item per line. So I created my own shorthand \TT{l} using:
+
+\begin{lstbash}
+user@host:~$ alias l='ls -ahl'
+\end{lstbash}
+
+After executing this command, I simply type \keys{L+\enter} to list folder contents, instead of a lengthy \keys{L+S+\space+-+A+H+L+\enter}.
+
+\subsubsection{Making your Bash shell cozy}
+
+\begin{refmanbash}
+\menu[,]{INCOVATION}
+\end{refmanbash}
+
+\begin{hintbox}
+{\olliHandLeft} For convenience I have a plethora of personal settings, aliases, functions and other goodies in my own ``dot files'', named after the leading dot. For Bash the following files are relevant as they get \emph{sourced} during startup of Bash:
+	\begin{itemize}
+		\item \TT{~/.profile}
+		\item \TT{~/.bash\_profile}
+		\item \TT{~/.bashrc}
+	\end{itemize}
+Consult the manual for more details.
+
+You can find all \emph{my dot files} over at \extlink{https://github.com/assarbad/dotfiles}{github.com/assarbad/dotfiles}; they are not limited to Bash, though. Feel free to ``borrow'' bits and pieces.
+\end{hintbox}
+
+\subsection{Connecting commands}\label{cmd_combos}
+
+\begin{refmanbash}
+\menu[,]{SHELL GRAMMAR}
+\end{refmanbash}
+
+There are a multitude of ways to connect commands in Unix shells, but let us for now focus on four of them. Say you wanted to create a folder hierarchy like we did in the section about \emph{brace expansion} and if that succeeds you want to populate the hierarchy with some files. That's a \emph{condition} do Y, but only if X succeeded.
+
+Similarly, sometimes you want to run a command if the previous command did not succeed or independent of whether or not it succeeded. So with X, Y and Z being placeholders for commands, we have the following forms of combining commands:
+
+\begin{description}
+	\item[Run Y only if X succeeds:] \termcmd{X \&\& Y}
+	\item[Run Y only if X fails:] \termcmd{X \textbar\textbar{} Y}
+	\item[Run Y regardless of whether X succeeds or fails:] \termcmd{X; Y}
+	\item[Run Y only if X succeeds or Z if it fails:] \termcmd{X \&\& Y \textbar\textbar{} Z}
+\end{description}
+
+Getting back to the above contrived example we could use a more terse command line:
+
+\begin{lstbash}
+user@host:~$ mkdir -p log/{00..99}/{system,user} && touch log/{00..99}/{system,user}/{a..z}
+\end{lstbash}
+
+\ldots{} which will create the whole folder hierarchy and then create files named \TT{a} through \TT{z} inside the deepest level of \emph{each} folder in the hierarchy.
+
+There is one more way of combining commands that I want to gloss over. By using \TTQ{\textbar} (the pipe character), you can connect the output stream of the preceding command the pipe with the input stream of the following command. The explanation about these streams is beyond the scope of this booklet, but you can read about it yourself on \wplink{http://en.wikipedia.org/wiki/Standard_streams}{Wikipedia}\label{stdstreams}.
+
+We have seen it before when I showed only the last fifteen lines of the folder hierarchy created as explanation of \emph{brace expansion}.
+
+\begin{lstbash}
+user@host:~$ tree -d log|tail -n 15
+\end{lstbash}
+
+For now you will probably be interested in very few use cases, like these exemplary ones:
+
+\begin{description}
+	\item[Output too long to read] use \termcmd{command | less} to pipe the output of \TT{command} into the \TT{less} pager.
+	\item[Finding a term in output] use \termcmd{command | grep 'term'} or if you want to search case-insensitive use \termcmd{command | grep -i 'term'}\footnote{Where \TT{term} is of course an actual term you are looking for.}.
+\end{description}
+
+\begin{hintbox}
+{\olliHandLeft} We will dig deeper into the topic when we get to writing scripts in \vref{pipes}.
+\end{hintbox}
+
+\section{Helping yourself}
+
+\begin{quote}
+Give a man a fish and you feed him for a day; teach a man to fish and you feed him for a lifetime.
+\end{quote}
+
+\subsection{Help about system commands}
+
+By now you must have realized the sheer vastness of the Bash feature set alone, not to speak of all the system programs that there are. If you know a term related to a program that may be installed, but do not know the name of the program, try either \TT{apropos} or \TT{whatis}. Both list documentation related to the term or terms you give as argument.
+
+\begin{lstbash}
+user@host:~$ apropos ldd
+dpkg-checkbuilddeps (1) - check build dependencies and conflicts
+ldd (1)              - print shared library dependencies
+pldd (1)             - list dynamic shared objects loaded into process
+user@host:~$ whatis ldd
+ldd (1)              - print shared library dependencies
+user@host:~$
+\end{lstbash}
+
+Where \TT{apropos} a bit more fuzzy in its search, \TT{whatis} gets straight to the point.
+
+The \TT{man} command, short for showing the ``\underline{man}ual'' page, allows us to see a detailed help about all kinds of system commands. In fact the output of \TT{apropos} and \TT{whatis} above pointed us to three different manual pages on lines 2, 4, and the same page on lines 3 and 6. Simply ask for help using: \termcmd{man <topic>}. And yes, there is a manual page for \TT{man} itself:
+
+\begin{lstbash}
+user@host:~$ man man
+\end{lstbash}
+
+\subsubsection{Navigating inside manual pages}
+
+Now in most cases a modern system will be configured to use \TT{less} as the so-called \emph{pager} for manual pages. This means you can look up the documentation for \TT{less} to find out more.
+
+But here is the brief overview:
+
+\begin{itemize}
+	\item \keys{?} to search upward, followed by the text string to search for
+	\item \keys{/} to search downward, followed by the text string to search for
+	\item \keys{\esc} to leave the search mode
+	\item \keys{Q} to quit, if the last line shows the \TT{:} prompt
+	\item \keys{\Space} next page down
+	\item \keys{\arrowkeyup} and \keys{\arrowkeydown} to go up and down respectively on a line-wise basis
+	\item \keys{PgUp} and \keys{PgDn} to go up and down respectively on a page-wise basis
+\end{itemize}
+
+\begin{hintbox}
+{\olliHandLeft} The \keys{Q} key will help you to \underline{q}uit many a program on Unix platforms.
+\end{hintbox}
+
+\subsection{Help about Bash builtins}
+
+To see an overview of all Bash builtins on the terminal, issue a \termcmd{help}. To get detailed help about a particular builtin, say \Arg{history}, use the form \termcmd{help <command>}, that is for example: \termcmd{help history}.
+
+\chapter{Bash Scripting}
+
+Typing commands on the shell prompt, executing them, combining them in simple ways, all this is but a rehearsal of the true potential: \emph{scripting}.
+
+A \emph{script} on the surface is a bunch of commands that get executed. But all its logic and the way commands can be combined, make scripts a very powerful tool for casual and professional users, administrators and hackers alike.
+
+Let's get started! \extlink{http://drtechniko.com/how-to-train-your-robot/}{Programming is a kid's play}.
+
+\section{Comments}
+
+\begin{refmanbash}
+\menu[,]{COMMENTS}
+\end{refmanbash}
+
+If you write scripts it is both customary and useful to your future selves to include comments.
+
+While it makes no sense to duplicate in a comment what the code does, the rationale for a certain condition or value definitely makes for a good comment. During your learning phase there is no shame to abuse comments to remind yourself of what particular commands or programming language constructs are used for. Consider the following text file:
+
+\begin{lstbash}
+# This is a comment
+# this is still a comment \
+and strangely so is this?!
+echo "Hello world" # a command trailing comment
+     # whitespace before comments is also ignored
+echo "# this is not a comment"
+\end{lstbash}
+
+Bash only knows single line comments.
+
+\begin{enumerate}
+    \item shows a single line comment
+    \item shows another single line comment, but the trailing \TTQ{\textbackslash} (backslash) is odd
+    \item the backslash from the previous line in fact causes \emph{this line} to to be effectively appended to the previous line
+    \begin{itemize}
+        \item[\olliPenR] This happens whenever the backslash is the last character on the line. It also happens on non-comment lines.
+    \end{itemize}
+    \item shows a command \emph{followed} by a comment
+    \item shows a number of blank spaces followed by a comment
+    \item shows a string containing the \TTQ{\#} (hash), but this is \emph{not a comment}
+\end{enumerate}
+
+\subsection{The shebang}\label{shebang}
+
+A special form of a comment in scripts is the shebang. The shebang -- sometimes also called hash bang -- gets introduced by the two characters \TTQ{\#!} (hash and bang\footnote{\ldots{} or exclamation mark in a more formal manner}) the alternative name suggests.
+
+This comment has to appear at the very beginning of the file, with the \TTQ{\#} being the first character inside the file.
+
+\begin{hintbox}
+    {\olliPenR} It is important to remember that the shebang \emph{must appear} as the very first characters of the file.
+
+    If your editor uses a character encoding such as \wplink{https://en.wikipedia.org/wiki/UTF-8}{UTF-8} the editor may include a so-called byte order mark \emph{at the very beginning} of the file. This byte order mark is normally not visible. Therefore it is important to remember that your editor may have inserted it, rendering the shebang dysfunctional.
+\end{hintbox}
+
+The shebang points the operating system to the so-called \emph{interpreter} to use in order to interpret the commands in the script.
+
+Ordinarily you will see Bash scripts starting like this:
+
+\begin{lstbash}
+#!/bin/bash
+echo "Hello world!"
+\end{lstbash}
+
+\section{Conditions}
+
+\begin{refmanbash}
+\menu[,]{SHELL GRAMMAR}
+\end{refmanbash}
+
+\subsection{Boolean logic}
+
+\wplink{https://en.wikipedia.org/wiki/Boolean_algebra}{Boolean logic}\footnote{Sometimes called Boolean algebra after the inventor George Boole.} is a complex mathematical field. However, for now we care about only a few operations and about the fact that an \emph{expression} can be \textbf{true} or \textbf{false}.
+
+We use this terminology when talking about conditions which can be either \emph{true} or \emph{false} as well.
+
+\subsection{Exit codes}
+
+We already discussed some ways to connect commands the shell prompt in \vref{cmd_combos}. However, the underlying mechanism for these ways to connect commands was not yet explained.
+
+Programs on Unix will return an integer code when they exit. By convention a program returning \TT{0} (zero) on exit will be considered a successful run, whereas any non-zero value is a failure.
+
+That exit code is available to Bash in a variety of ways. To revisit the example \vpageref{cmd_combos}:
+
+\begin{description}
+    \item[Run Y only if X succeeds or Z if it fails:] \termcmd{X \&\& Y \textbar\textbar{} Z}
+\end{description}
+
+What actually happens here is that if the exit code of command \TT{X} is zero, we continue by executing command \TT{Y}. If on the other hand \TT{X} was non-zero we proceed by executing command \TT{Z} instead.
+
+This terse form of conditions is useful on the command line, but inside of scripts it is sometimes more helpful
+
+If this sounds strange at first, let us consider a more descriptive way of expressing the above logic:
+
+\begin{lstbash}
+if X; then
+  Y
+else
+  Z
+fi
+\end{lstbash}
+
+The exit code of a command can be accessed using the Bash implicit variable \verb|$?|.
+
+\subsection{The \TT{if}-statement}
+
+\TT{if}-statement allows us to express conditions in a more natural way. In fact the above and already lengthy example could be written without the semi-colon by inserting a line break instead.
+
+\begin{lstbash}
+if X
+then
+Y
+else
+Z
+fi
+\end{lstbash}
+
+This, however, is purely a cosmetic consideration. Personally I prefer the form whether the \TT{if} and the \TT{then} appear on the same line.
+
+In the example, the exit code of command \TT{X} governs in which \emph{branch} of the condition we end up. The canonical form of the \TT{if}-statement is:
+
+\begin{lstbash}
+if condition1; then
+  # commands if condition1 was true
+elif condition2; then
+  # commands if condition2 was true
+else
+  # commands if neither condition was true
+fi
+\end{lstbash}
+
+You may add several conditions by adding more \TT{elif} blocks. The indentation is purely cosmetic, but it improves readability -- so I recommend you indent your own code \emph{consistently} in scripts.
+
+In the following section we will mostly see the \TTQ{if ... fi} form of the \TT{if}-statement. But this is just for the sake of simplicity. More conditions \emph{could} nevertheless be added by means of \TT{elif}.
+
+\subsubsection{Simple truth checks}
+
+The simplest form of the \TT{if}-statement is indeed the one we saw above. For example if you wanted to check whether file \TT{/home/oliver/output.log} contains the text \TTQ{foo bar baz} you could express it as follows, using the \TT{grep}\footnote{Please look up the command yourself, using \termcmd{man grep}.} command:
+
+\begin{lstbash}
+if grep -q 'foo bar baz' /home/oliver/output.log; then
+  # the string was found, do something specific
+fi
+\end{lstbash}
+
+This relies only on the exit code of the \TT{grep} command to signal success -- meaning the text was found -- or failure.
+
+\subsubsection{Checking other conditions}
+
+Shells before Bash used the following form and you will still find this form in many a Bash script:
+
+\begin{lstbash}
+if [ -d "/home/oliver" ]; then
+  # directory /home/oliver exists
+fi
+\end{lstbash}
+
+The \verb|\[| is in fact an external command, with the \TT{-d} and so on being its arguments. It looks like a special syntax, but in fact it is not\footnote{This means the syntax is available in a wide array of shells.}. The \verb|\[| command is largely identical to the \namecmd{test} command. To demonstrate:
+
+\begin{lstbash}
+if test -d "/home/oliver"; then
+  # directory /home/oliver exists
+fi
+\end{lstbash}
+
+\subsubsection{Bash's way}\label{bash_tests}
+
+\begin{refmanbash}
+\menu[,]{CONDITIONAL EXPRESSIONS}
+\end{refmanbash}
+
+Initially the Bash-specific form looks like a cosmetic variation of the one discussed above:
+
+\begin{lstbash}
+if [[ -f "/etc/crontab" ]]; then
+  # file /etc/crontab exists
+fi
+\end{lstbash}
+
+Alas, it is not. The double brackets (\verb|[[ ... ]]|) are a Bashism that allows to introduce new semantics. An example of extended functionality is matching against Bash's flavor of regular expressions\footnote{Regular expressions are a terse way to describe text properties in order to match text that corresponds to its formal description.}.
+
+We will get back to the topic later on.
+
+\section{Variables revisited}
+
+When we last discussed variables in \vref{env_vars}, we skipped one important fact. Bash distinguishes between two string forms. One uses single quotes to delimit the string and the other uses double quotes.
+
+The single quote version will \emph{not expand} referenced variables, whereas the double quote version \emph{will expand} them. Observe:
+
+\begin{lstbash}
+user@host:~$ echo 'We are running $SHELL'
+We are running $SHELL
+user@host:~$ echo "We are running $SHELL"
+We are running /bin/bash
+user@host:~$
+\end{lstbash}
+
+Since the single quotes are used to delimit the string in the first form, this slightly modified example code will cause a strange behavior:
+
+\begin{lstbash}
+user@host:~$ echo 'We're running Bash'
+> _
+\end{lstbash}
+
+What happens here is that, surprisingly, \TTQ{'We're} is the first argument to \namecmd{echo}, followed by \TTQ{running} and the \emph{incomplete} argument \TTQ{Bash'}. The last argument is incomplete because it has an opening single quote, but not a closing one.
+
+Bash will therefore assume that we simply meant to add a line break and want to continue our string on the next line. This is what the leading \TTQ{>} denotes\footnote{The underscore is meant again to symbolize the cursor in this example.}.
+
+\begin{hintbox}
+    {\olliPenR} The command \namecmd{echo} takes an arbitrary number of whitespace-separated arguments. It will output these arguments one by one, separated with a single whitespace. To demonstrate we can pass two arguments with more than a single whitespace separating them:
+
+\begin{lstbash}
+user@host:~$ echo test       test
+test test
+\end{lstbash}
+\end{hintbox}
+
+\section{Functions}
+
+\begin{refmanbash}
+\menu[,]{SHELL GRAMMAR,Shell Function Definitions}
+\end{refmanbash}
+
+Remember your math classes? The natural logarithm $\ln(x) = y$ is \emph{one} example of a \emph{function}.
+
+A function in Bash may take no argument at all, one -- like the logarithm -- or several. It may also return one value\footnote{Attention: return values are not available in some older Bash versions. So do not be surprised if your script fails.}.
+
+Functions allow us to parametrize a group of commands. A real world example could be the creation of a group and a user of the same name\footnote{This is a contrived example, as modern versions of these utilities will create both in one step.}. In this case we need to pass the same argument to two different external commands.
+
+\begin{lstbash}
+function create_user_and_group
+{
+  groupadd $1
+  useradd -g $1 $1
+}
+\end{lstbash}
+
+The \TTQ{{\textdollar}1} is the first parameter passed to the function. The function in this example is named \TT{create\_user\_and\_group}.
+
+\begin{hintbox}
+    {\olliPenR} Passing arguments to functions obeys similar rules as for external commands. The arguments are passed whitespace-separated. Arguments containing whitespace must be grouped using single or double quotes as appropriate.
+\end{hintbox}
+
+Now to create a user \TTQ{joe} and a group of the same name, instead of typing out \TTQ{joe} several times or replacing all occurrences of the name in a script, we may call the function like this:
+
+\begin{lstbash}
+create_user_and_group joe
+\end{lstbash}
+
+The difference becomes more apparent when you have to create users \TTQ{joe} \emph{and} \TTQ{jane}. If we would use the two commands in sequence we would write:
+
+\begin{lstbash}
+groupadd joe
+useradd -g joe joe
+groupadd jane
+useradd -g jane jane
+\end{lstbash}
+
+Because the function lets us parametrize the calls, we save some typing:
+
+\begin{lstbash}
+create_user_and_group joe
+create_user_and_group jane
+\end{lstbash}
+
+\begin{hintbox}
+    \textbf{Keep it DRY.} The DRY principle, short for \emph{don't repeat yourself}, is one that you will meet again if you continue to dabble with programming methods.
+
+    It is a good principle to keep in mind and to embrace from the very start. If youever find yourself in a situation where you type out one thing several times, only changing one or multiple arguments: stop, think and parametrize.
+
+    The DRY principle has another, harder to see, benefit. If you only write your logic in one place, i.e. the \emph{function body}, you only need to fix this single occurrence should you find a mistake in the logic or need to extend it.
+\end{hintbox}
+
+\section{Loops}
+
+\begin{refmanbash}
+\menu[,]{SHELL GRAMMAR}
+\end{refmanbash}
+
+Loops are another useful programming construct to know if you want to adhere to the DRY principle. In fact \extlink{http://drtechniko.com/2012/04/09/how-to-train-your-robot/}{DrTechniko}, an academic who teaches kids programming principles in a playful manner, reports that children came to him or their parents asking something like: ``instead of writing this instruction out ten times over, may I write `do the following thing ten times'?''.
+
+That is loops in a nutshell for you. Loops allow you to \emph{iterate} over a number of elements, repeating the commands inside the loop body for each element in turn.
+
+\subsection{The \TT{for}-loop}
+
+Assuming our function \TT{create\_user\_and\_group} is defined, we can rewrite this:
+
+\begin{lstbash}
+create_user_and_group joe
+create_user_and_group jane
+\end{lstbash}
+
+into this:
+
+\begin{lstbash}
+for user in joe jane; do
+  create_user_and_group $user
+done
+\end{lstbash}
+
+It is one line more, you may argue. But it pays off quickly if you add more users to be created. And similarly to the logic in a function body, the logic in the loop body also needs to be fixed once and applies to all elements alike.
+
+\subsubsection{The other \TT{for}-loop}
+
+In old shell scripts or shell scripts written for older dialects of the Bourne shell, you will sometimes find \TT{for}-loops like these:
+
+\begin{lstbash}
+for i in `seq 1 10`; do
+  echo $i
+done
+\end{lstbash}
+
+This is used to iterate over the numbers from 1 to 10, in turn echoing them to the terminal. The backticks are a special way of saying ``execute the command inside the backticks and substitute the output of the command''.
+
+Bash has support for \emph{arithmetic expressions}, albeit only on integers\footnote{Not on floating point numbers, i.e. numbers with a decimal point.}.
+
+The following \TT{for}-loop makes use of the arithmetic expressions and will be more familiar to people coming from other programming languages:
+
+\begin{lstbash}
+for ((i=1; i<=10; i++)); do
+  echo $i
+done
+\end{lstbash}
+
+The three groups in the double parentheses mean:
+
+\begin{description}
+    \item[\TT{i=1}] is the start action: declare a variable \TTQ{i} and assign the value \TTQ{1} to it
+    \item[\TT{i<=10}] is the terminal condition: continue to loop as long as \TTQ{i} has a value less than or equal to 10
+    \item[\TT{i++}] step action: increment \TTQ{i} by one during every iteration
+\end{description}
+
+This terse form of writing the loop makes it more readable.
+
+\subsubsection{Short detour: arithmetic evaluation}
+
+\begin{refmanbash}
+\menu[,]{ARITHMETIC EVALUATION}
+\end{refmanbash}
+
+Arithmetic expressions can be evaluated using the double parentheses instead of double brackets in conditional expressions, e.g.:
+
+\begin{lstbash}
+if ((EUID > 0)); then
+  echo "You are not superuser"
+done
+\end{lstbash}
+
+But they can also come in handy in their immediate form \TTQ{{\textdollar}((EUID > 0))}. This immediate form will be substituted to whatever the the expression evaluates to. In this case the result may be true (\TT{EUID} is greater than \TT{0}) or false, which take the integer values 1 and 0 respectively.
+
+The more useful way is to use it for actual calculations of which the result should be substituted in-line. For example if you were told to give the number of bytes in a megabyte\footnote{More correctly for binary units: mebibyte or short MiB.} you could take out your calculator or ask Bash.
+
+\begin{description}
+    \item[One megabyte] is $1024$ kilobytes and $1$ kilobyte is $1024$ bytes.
+    \item[The mathematical expression] $2^{20}$ is one megabyte as a power of two, whereas $2^{10}$ is a kilobyte as a power of two.
+\end{description}
+
+If you know either of these facts, you can ask Bash for the result. If you want to take a calculator to check, now is the time:
+
+\begin{lstbash}
+user@host:~$ echo $((1024*1024))
+1048576
+user@host:~$ echo $((2**20))
+1048576
+user@host:~$
+\end{lstbash}
+
+Line one uses the first definition: 1024 times 1024 bytes, whereas line three uses the definition by power of two. There are precedence rules similar to those in math and you can group sub-expressions using parentheses.
+
+As you can see the resulting numbers can be quite unwieldy, but as long as you know how to get there, it is easy to find them.
+
+\subsubsection{The \TT{while}-loop}
+
+Beginners often stumble over one of the caveats of the \TT{for}-loop. By default the input field separator\footnote{The variable \TT{IFS}.} will be set in a way that makes \TT{for} look for whitespace-separated input. This means if your file name contains whitespace, you will end up with bits and pieces and your nicely designed logic inside the loop body will fall apart. Line breaks are also considered whitespace in this case.
+
+One way is to modify the input field separator. Another is to defer to the \TT{while}-loop. A \TT{while}-loop separates the input from standard input at line breaks. So if you take the input from a command such as \namecmd{find} which one item per line, \TT{while} is ideally suited to read that input. An example:
+
+\begin{lstbash}
+find -type f | while read fname; do
+  echo "$fname"
+done
+\end{lstbash}
+
+If you do not understand this code right away, proceed by reading the next section about redirection.
+
+\section{Redirection}
+
+Before, \vpageref{stdstreams}, we already heard about \wplink{http://en.wikipedia.org/wiki/Standard_streams}{standard streams}. Normally the standard stream for error output (\TT{stderr}) \emph{and} for standard output (\TT{stdout}) are connected to the terminal. Unless they are redirected.
+
+This section discusses some important forms of standard stream redirection.
+
+\subsection{Redirecting files and devices}
+
+The perhaps most widely used form of redirection will redirect the output \emph{nowhere}. This is useful to suppress output from commands that have no command line switch to suppress output. While the \TT{grep} command has the \TTQ{-q} switch to just allow that, it also makes for an excellent example if we pretend that the switch does not exist.
+
+\begin{lstbash}
+grep -R 'foo bar baz' /etc
+\end{lstbash}
+
+This instructs \namecmd{grep} to recursively look for the string \TTQ{foo bar baz} inside the folder \TT{/etc}.
+
+Now you may say that suppressing the output of something we would like to \emph{find} seems a bit odd. But remember there are two standard streams responsible for output. The \TT{/etc} folder is not widely accessible if you are an unprivileged user. So you may see some lines like this one:
+
+\begin{GenericListing}
+grep: /etc/shadow: Permission denied
+\end{GenericListing}
+
+That is normal and can be suppressed by rewriting the invocation from before as:
+
+\begin{lstbash}
+grep -R 'foo bar baz' /etc 2> /dev/null
+\end{lstbash}
+
+This will redirect the \TT{stderr} stream to the device \TT{/dev/null} which exists to gobble up anything you feed it, never to be seen again. In the above command we used \TTQ{2>} to refer to \TT{stderr}.
+
+If we wanted to suppress \TT{stdout} alike, we could say either of the following:
+
+\begin{lstbash}
+grep -R 'foo bar baz' /etc 1> /dev/null
+grep -R 'foo bar baz' /etc > /dev/null
+\end{lstbash}
+
+Line one is explicit about \TT{stdout}, whereas the lone \TTQ{>} in the second line is a shorthand for \TTQ{1>}.
+
+Please note that we could also opt to redirect errors to a file and suppress output to the terminal:
+
+\begin{lstbash}
+grep -R 'foo bar baz' /etc > /dev/null 2> errors.log
+\end{lstbash}
+
+Here we redirect \TT{stdout} to \TT{/dev/null} as before, but redirect \TT{stderr} to the file \TT{errors.log} in the current working directory.
+
+If we canted to redirect both \TT{stdout} and \TT{stderr} there is a shorthand for that as well. You should be able to understand the first line immediately:
+
+\begin{lstbash}
+grep -R 'foo bar baz' /etc > /dev/null 2> /dev/null
+grep -R 'foo bar baz' /etc > /dev/null 2>&1
+\end{lstbash}
+
+\ldots{} but the second line is somewhat strange. What it says is ``redirect stream 2, i.e. \TT{stderr}, to the same place as standard stream 1, i.e. \TT{stdout}''.
+
+\begin{hintbox}
+    {\olliHandLeft} Please beware of the following caveat: \emph{if} you tell Bash to redirect one stream to the target of another stream, you must make sure to get the order right. For example if we redirected \TT{stdout} \emph{after} redirecting \TT{stderr}, the latter will point to the target \emph{before} redirection. So in the following example the \TTQ{2>\&1} will have no visible effect:
+
+\begin{lstbash}[true]
+grep -R 'foo bar baz' /etc 2>&1 > /dev/null
+\end{lstbash}
+
+    {\olliPenR} The standard streams have the \emph{file numbers} 0, 1 and 2 respectively for \TT{stdin}, \TT{stdout} and \TT{stderr}. This is what we referred to in above invocations.
+\end{hintbox}
+
+\subsection{Getting input from files}
+
+There are several ways to connect the standard input stream to a file. Most Unix commands are prepared to read from \TT{stdin}. If we wanted to feed the \namecmd{grep} command from before the contents of the file \TT{\mytilde/foobar.txt}.
+
+\begin{lstbash}
+cat ~/foobar.txt | grep 'foo bar baz'
+grep 'foo bar baz' < ~/foobar.txt
+\end{lstbash}
+
+Both methods are perfectly valid and okay to use, but some people argue that the former imposes a slight performance overhead, because the \namecmd{cat} command is invoked, whereas in the latter Bash takes care of reading and feeding the file to \namecmd{grep}.
+
+\subsection{Piping: getting input from commands}\label{pipes}
+
+Incidentally the example from the previous subsection already foreshadowed the method described in this one. In order to connect the standard input of \namecmd{grep} to the standard output of \namecmd{cat} we use the pipe character \TTQ{\textbar}\footnote{On a German Mac the keyboard shortcut should be \keys{Alt+7}} to connect them. We have seen it before:
+
+\begin{lstbash}
+cat ~/foobar.txt | grep 'foo bar baz'
+\end{lstbash}
+
+The pipe in Bash behaves quite similar to its counterpart in the physical world. If you push enough material into one end, it will come out the other end. Also, there are only two ends. No complex plumbing allowed. Well, not yet.
+
+One of the popular uses of pipes is to show the lengthy output from a command by piping into a pager such as \namecmd{less}. But probably by far the most popular is to slice and dice the output from one command, by piping it through a variety of other tools that filter or mangle the input and pass it on to their \TT{stdout} which in turn may be connected to yet another command.
+
+For example to get the output from the \namecmd{df} command to see free disk space in a human-readable form, skip the header line shown by \namecmd{df} using \namecmd{tail} and then pick only the lines that start with \TTQ{/dev} using \namecmd{grep} might look like this:
+
+\begin{lstbash}
+$ df -h|tail -n +2|grep ^/dev
+/dev/md0                       64G  1.6G   61G   3% /
+/dev/md1                      128G  806M  126G   1% /var
+/dev/md2                      256G  123G   62G  67% /data
+/dev/md3                      1.4T  4.7G  1.4T   1% /data/vm
+\end{lstbash}
+
+With the methods introduced in \vref{bash_history} you should be able to assemble your own command lines even if they can sometimes become fairly long.
+
+\subsubsection{Process substitution}
+
+\begin{refmanbash}
+\menu[,]{EXPANSION,Process Substitution}
+\end{refmanbash}
+
+There is another, more arcane, method of getting input from another command. This, for example, comes in handy with commands that expect two input files like the \namecmd{diff} command. In such a case the \emph{process substitution} comes in handy:
+
+\begin{lstbash}
+diff <(cat ~/foobar.txt) <(cat ~/foobar.old)
+\end{lstbash}
+
+The above command is a rather silly example as the same could be achieved by simply passing the file names instead. However, under normal circumstances you would have an arbitrarily complex list of commands inside the parentheses. And \emph{then} it \emph{does} make sense.
+
+Process substitution can be used for input and output alike\footnote{That is, with \TTQ{>(...)} you can redirect the output to a command that may do additional filtering.}. But if you really want to delve into this, I recommend reading the manual page of Bash.
+
+\section{Connecting commands, revisited}
+
+Now that we are better equipped with knowledge about the shell grammar, we should revisit a topic from earlier on page \pageref{cmd_combos}.
+
+As we learned we can combine commands not just through conditions (\TTQ{\&\&} and \TTQ{\textbar\textbar}) or by listing them out, separated by semi-colons, but also by connecting their standard streams by means of piping.
+
+What we have not discussed, though, is that you may connect several commands in a row this way. For example to find all lines in \TT{\mytilde/foobar.txt} that contain \TTQ{foo bar} but not \TTQ{baz} one could write:
+
+\begin{lstbash}
+grep 'foo bar' ~/foobar.txt | grep -v 'baz'
+\end{lstbash}
+
+You may also group commands using the braces\footnote{\ldots{} or curly brackets.}. This way you can pipe the output of a whole list of commands to the \TT{stdin} of another command.
+
+If, for example, you needed to add lines before and after the output of \namecmd{grep}, then redirect that to a \namecmd{grep} filtering out instances of the text \TTQ{baz} and then writing that into a file \TT{\mytilde/out.txt}, you may write:
+
+\begin{lstbash}
+{ echo "Start of file"; grep 'foo bar' ~/foobar.txt|grep -v 'baz'; echo "End of file"; } > out.txt
+\end{lstbash}
+
+Yes, that is one long line. However, we could split it up a little to make it more readable. We will use trailing backslashes to have Bash join them onto a single line before execution:
+
+\begin{lstbash}
+{ \
+  echo "Start of file"; \
+  grep 'foo bar' ~/foobar.txt | grep -v 'baz'; \
+  echo "End of file"; \
+} > out.txt
+\end{lstbash}
+
+Pretty impressive, eh?
+
+The canonical form of the grouping of commands using braces is:
+
+\begin{lstbash}
+{ command1; command2; command3; ...; }
+# or ...
+{ list; }
+\end{lstbash}
+
+Mind the trailing semi-colon before the closing brace. Also have a blank space between the braces and the content they wrap as Bash occasionally gets confused if you do not.
+
+Grouping commands this way will execute them in the context of the current shell. This is important to remember when we discuss subshells in one of the following chapters.
+
+\section{The \TT{case}-statement}
+
+\begin{refmanbash}
+\menu[,]{SHELL GRAMMAR,Compound Commands}
+\end{refmanbash}
+
+If the conditions from an \TT{if}-statement is about matching a particular name or path and if you need to match more than a single pattern, the \TT{case}-statement will be a better fit. It is commonly used to match against command line switches, against expected names by a common prefix or suffix and more.
+
+The canonical form of the \TT{case}-statement is:
+
+\begin{lstbash}
+case $VAR in
+  prefix*|pfx*)
+    echo "Found a prefix"
+    ;;
+  *suffix|*ext)
+    echo "Found a suffix"
+    ;;
+  *)
+    echo "Unexpected $VAR"
+    ;;
+esac
+\end{lstbash}
+
+The \TT{case}-statement requires you to separate the individual matches by double semi-colons as shown. The \TTQ{\textbar} (pipe character) in this case are there to denote an alternation between the given patterns. With case it is possible to match quite complex patterns and by combining multiple patterns into a single case.
+
+The value or ``word'' matched against (\TTQ{{\textdollar}VAR} above) is subjected to several expansion types discussed before\footnote{\ldots{} and a few yet to discuss. Refer to the Bash manual page for the exact details.}, \emph{but not path expansion}, as well as quote removal. So whether we write \TT{"{\textdollar}VAR"} or \TT{{\textdollar}VAR} in the above example makes no difference. Each case in a \TT{case}-statement is also subject to the same expansions, but not to quote removal.
+
+\begin{hintbox}
+    {\olliPenR} It should be obvious why path expansion does not take place here. All our patterns would go to shambles during that phase, just because no files exist that match. Aside from that it would mean that the patterns would get expanded prior to matching, which is a silly idea.
+\end{hintbox}
+
+By the way, the last case in our case-statement, the \TTQ{*)} is a way to catch everything not caught in the other cases. It is customary, but not mandatory, to have a catch-all case, though.
+
+Just to give you an idea why it is useful, though: imagine you have a bunch of command line switches. The set of available command line switches in any given version of your script is finite and known. However, when you author the change from one version to the next, you have to keep track of all the places where the introduction of a new command line switch matters. Having a catch-all case will help you in such a scenario as it allows you to see that something slipped through the ``net'' of patterns in your \TT{case}-statement.
+
+\section{A more portable shebang}
+
+When the shebang was introduced in \vref{shebang} we did not care about variations between operating systems. Alas, since they exist we must take care to accommodate as many of them as possible. Otherwise a script that might run perfectly fine will simply not run because its shebang points to a non-existing path.
+
+Bash is not the default shell on FreeBSD, for example. Because of that it does not live under \namecmd{/bin/bash} but rather under \namecmd{/usr/bin/bash}. On some systems it may even live under \namecmd{/usr/local/bin/bash}. The point is that the path to Bash can vary.
+
+We can work around those variations by referring to a program which is available on almost every Unix platform and always resides in the same location: \namecmd{/usr/bin/env}. We already met it in \vref{env_cmd} when we were using it to list environment variables.
+
+It turns out that printing the environment is but one of the uses for the command. Its actual purpose is to execute another command with a changed set of environment variables.
+
+Essentially the following two methods are equivalent, whereas the former is shell-specific and the latter is more universal:
+
+\begin{lstbash}
+LANG=C date
+env LANG=C date
+\end{lstbash}
+
+If you do not pass a changed set of environment variables, it will simply execute the command as is, observing the \TT{PATH}\footnote{We already encountered this variable in \vref{path_var}.} environment variable to find which program to invoke from where.
+
+With this knowledge we can devise a shebang that will automatically invoke the \namecmd{bash} executable where ever it happens to reside on an individual system:
+
+\begin{lstbash}
+#!/usr/bin/env bash
+\end{lstbash}
+
+Here we delegate the duty of finding the correct program executable for Bash to the \namecmd{env} command. It turns out that this method works quite nicely across a variety of systems which required individual shebangs before.
+
+\begin{hintbox}
+    {\olliPenR} The lessons learned from this section can also be applied to other scripting languages, such as Python or Perl, by the way.
+
+    Another way to work around the variations is by placing a symbolic link to the real Bash binary inside \TT{/bin}.
+\end{hintbox}
+
+\section{Subshells}
+
+In the Unix world subshells are found in many scenarios. In many cases you will not even realize at first glance that what you saw was the effect of a shell instance running inside another shell instance.
+
+\subsection{Sourcing versus executing a script}\label{sourcing}
+
+The \namecmd{source} builtin of Bash will read and execute a script inside the current shell. We can test this best by writing a little script first:
+
+\begin{lstbash}
+#!/usr/bin/env bash
+echo "Hello world: $$"
+\end{lstbash}
+
+The \TTQ{\textdollar\textdollar} in the above code is used to denote the process identifier, or PID, of the shell instance that executes the \namecmd{echo}.
+
+Now if we ``source'' the script several times, you will see that the PID value does \emph{not} change:
+
+\begin{lstbash}
+source sshell
+\end{lstbash}
+
+After making the script executable with the command \termcmd{chmod +x ./sshell} we can execute the script as follows:
+
+\begin{lstbash}
+./sshell
+\end{lstbash}
+
+The notable difference is that the second method will output a changing PID every time, whereas the first method will not output a changing PID.
+
+And the reason for that is simple. When executing \termcmd{./sshell} the script runs in its own shell instance, whereas with \termcmd{source sshell} runs in the same shell instance from which the \namecmd{source} command was issued.
+
+\begin{hintbox}
+    {\olliPenR} This is also often used to source the contents of configuration files for a script.
+\end{hintbox}
+
+\subsection{Command substitution}
+
+As we have seen earlier \vpageref{sourcing} one way to execute a shell inside another shell instance is by executing a script from the shell prompt. As we have also seen throughout the booklet many programs output individual pieces of information. Would it not be useful to be able to capture that output?
+
+Well it is and we are not the first to consider it useful. Bash comes with a feature called \emph{command substitution}. This allows us to substitute an invocation of one or several commands by the output.
+
+\subsubsection{The old backtick notation}\label{bash_backtick}
+
+In many scripts, especially those striving to comply to the POSIX standard and avoid Bashisms, you will see code like this:
+
+\begin{lstbash}
+RELEASE=`uname -r`
+\end{lstbash}
+
+This is the older form of command substitution. Some other languages like Perl also assign special meaning to the backticks (\TTQ{`}).
+
+Please avoid this notation at all costs. As long as you do not want or need to nest the subshell invocations, the problem can be neglected for the most purposes. However, if you consequently use the modern form to be introduced in \vref{bash_subshell}, you will never even have to think about nesting, quotes and escaping of nested elements.
+
+\subsubsection{The modern notation}\label{bash_subshell}
+
+The modern form of command substitution is \termcmd{echo {\textdollar}(uname -r)}. Admittedly this particular example is a bit silly, since you can achieve the same by simply running \termcmd{uname -r}. However, the utility will become obvious in a moment.
+
+Just like earlier \vpageref{bash_backtick} it is also possible to assign the output of a command to a variable:
+
+\begin{lstbash}
+RELEASE=$(uname -r)
+\end{lstbash}
+
+In general command substitution is useful in order to retrieve information that is not readily available without the invocation of a command.
+
+\subsubsection{Backtick versus \TT{\textdollar(...)}}
+
+The main difference between backticks and the modern form of command substitution is that the modern form does not require special quoting or escaping considerations. Let us contrast two nested command substitutions.
+
+We will use the current kernel release to find a file and use that resulting file name to retrieve its timestamp. Since \emph{current} is relative to the time of invocation, we will use the previously introduced \namecmd{uname -r} to find the exact active kernel version. The modern notation first:
+
+\begin{lstbash}
+echo "$(stat -c "%z" "/boot/vmlinuz-$(uname -r)")"
+\end{lstbash}
+
+\ldots{} and pick it apart by replacing the command substitutions with variable names to yield a more sequential view of what is going on:
+
+\begin{lstbash}
+KERNELFILE="/boot/vmlinuz-$(uname -r)"
+TIMESTAMP=$(stat -c "%z" "$KERNELFILE")
+echo "$TIMESTAMP"
+\end{lstbash}
+
+
+This should help you to see what is going on. The inner command gets substituted by its output first. So in our example the value of \TT{{\textdollar}KERNELFILE} could expand to something like \TTQ{/boot/vmlinuz-5.15.0-58-generic}. We then use \namecmd{stat} to output the last changed timestamp of that file in a human-readable fashion. Last but not least we output the resulting string using \namecmd{echo}.
+
+If we wanted to achieve the same with backticks it would be a lot more convoluted. Observe:
+
+\begin{lstbash}
+echo "`stat -c \"%z\" \"/boot/vmlinuz-\`uname -r\`\"`"
+\end{lstbash}
+
+As you can see now, we have to escape the inner backticks and double quotes, an effort that is simply ot required with the modern notation. The old backtick notation reaches its practical limit already with just two levels of nesting. Imagine three or more levels.
+
+\subsection{Subshell semantics}
+
+\subsubsection{Variables}
+
+One of the most important considerations when using subshells is that local variables are not going to be available inside subshells. That can be surprising at first.
+
+Remember, that we talk about shell-local variables here. Those are the ones not exported by means of the \namecmd{export} builtin.
+
+What you need to understand is that environment variables are kept in a special list for each process. Your shell instance is just another one of those processes, so it has such a list. If you \namecmd{export} a variable you add it to the list or, if the variable name existed before, you overwrite the existing value.
+
+Only variables listed in that block or directly on the command line will take effect in another command started from your shell instance. When you start a subshell, you just invoke a command using a particular syntax.
+
+\subsubsection{Current working directory}
+
+The current working directory is also local to each shell instance, much like the environment block.
+
+\subsection{Using subshells to group commands}
+
+In addition to command substitution you can also use subshells to group commands or limit their effect. Personally I like to make use of the fact that the working directory is local to the subshell, for example:
+
+\begin{lstbash}
+( cd /boot && ls -dl * )
+\end{lstbash}
+
+The \namecmd{cd} will change into the directory and the \namecmd{ls} will list its contents in this case. Contrast that with the subtly different \termcmd{ls -dl /boot/*}. There can be good reasons for temporarily changing into a directory and executing a command there.
+
+Since we run this in a subshell, the current working directory of the \emph{invoking} shell instance is not affected.
+
+\section{String substitution using Parameter Expansion}
+
+\begin{refmanbash}
+    \menu[,]{EXPANSION,Parameter Expansion}
+\end{refmanbash}
+
+\emph{Parameter expansion} is one of the niftier features of Bash. It can be used in-line during assignments and it allows us to alter variable values in predictable ways. For example we can extract the name of the file from a path without invoking any external helper program. We can also -- at least in newer Bash versions -- change the text to lower or upper case.
+
+We will focus on the most useful and more widely used types of substitution here. For more information you may always consult the Bash manual page on your own.
+
+\subsection{Default values and errors}
+
+I will use the nomenclature used by Bash to name each individual item.
+
+\begin{description}
+    \item[Use default value] \TTQ{{\textdollar}\{var:-default value\}} will expand to the value of \TTQ{{\textdollar}var} or, if that is not set or empty, to \TTQ{default value}.
+    \item[Assign default value] \TTQ{{\textdollar}\{var:=default value\}} will expand to the value of \TTQ{{\textdollar}var} or, if that is not set or empty, to \TTQ{default value}. \textbf{However}, this will \emph{also assign} the value to the variable in the same statement.
+    \item[Display error if null or unset] \TTQ{\{\textdollar}{var:?Error: var is not set\}} will expand to the value of \TTQ{{\textdollar}var} or, if that is not set or empty, will output the given error message and exit.
+    \item[Use alternate value] \TTQ{{\textdollar}\{var:+alternate value\}} will expand to \TTQ{alternate value} if \TTQ{{\textdollar}var} is not set or empty, otherwise nothing will be substituted.
+    \item[Substring expansion] comes in two forms \TTQ{{\textdollar}\{var:offset\}} and \TTQ{{\textdollar}\{var:offset:length\}} and will expand to the substring referenced. If no \TT{length} is given the substring is from the given \TT{offset} to the end of the string\footnote{There are more rules, but those are beyond the scope of this booklet. Please look them up in the Bash manual yourself.}.
+\end{description}
+
+As a side-note, \TTQ{{\textdollar}\{\#var\}} returns the length of the value for \TTQ{{\textdollar}var}.
+
+\subsection{Mutating variables}
+
+\begin{description}
+    \item[Remove matching prefix pattern] will remove a pattern at the beginning of the value
+    \begin{description}
+        \item[\ldots{} longest] \TTQ{{\textdollar}\{var\#\#pattern\}}, e.g. \TTQ{{\textdollar}\{var\#\#*/\}} will give you the file name from a given relative or full path\footnote{Assuming the forward slash ``/'' is the path separator.}
+        \item[\ldots{} shortest] \TTQ{{\textdollar}\{var\#pattern\}}, e.g. \TTQ{{\textdollar}\{var\#?*/\}} will strip the leading directory segment from a path\footnote{Had we just written \TTQ{{\textdollar}\{var\#*/\}} it would only affect the leading slash.}
+    \end{description}
+    \item[Remove matching suffix pattern] will remove a pattern at the end of the value
+    \begin{description}
+        \item[\ldots{} longest] \TTQ{{\textdollar}\{var\%\%pattern\}}
+        \item[\ldots{} shortest] \TTQ{{\textdollar}\{var\%pattern\}}, e.g. \TTQ{{\textdollar}\{var\%/*\}} will give you the directory part of a path, that is: without the last segment
+    \end{description}
+    \item[Pattern substitution] \TTQ{{\textdollar}\{var/pattern/string\}} is probably the most powerful of all the transformations. It allows us to match and replace. The following special cases exist:
+    \begin{description}
+        \item[\ldots{} replace all] \TTQ{{\textdollar}\{var//foo/fle\}} would replace \emph{all} occurrences of \TTQ{foo} in \TTQ{{\textdollar}var} to \TTQ{fle}.
+        \item[\ldots{} replace at beginning] \TTQ{{\textdollar}\{var/\#foo/fle\}} would replace occurrences of \TTQ{foo} at the beginning of \TTQ{{\textdollar}var} to \TTQ{fle}.
+        \item[\ldots{} replace at end] \TTQ{{\textdollar}\{var/\%foo/fle\}} would replace occurrences of \TTQ{foo} at the end of \TTQ{{\textdollar}var} to \TTQ{fle}.
+        \item[\ldots{} delete match] \TTQ{{\textdollar}\{var//foo\}} would remove occurrences of \TTQ{foo}in \TTQ{{\textdollar}var}. note how we are allowed to leave out the slash separating \TT{pattern} and \TT{string} in this case.
+    \end{description}
+    \item[Case modification] introduced \extlink{http://wiki.bash-hackers.org/scripting/bashchanges}{with Bash 4.0} allows us to influence the case of a text
+    \begin{description}
+        \item[\ldots{} uppercase first letter] \TTQ{{\textdollar}\{var\textasciicircum\}}
+        \item[\ldots{} uppercase whole string] \TTQ{{\textdollar}\{var\textasciicircum\textasciicircum\}}
+        \item[\ldots{} lowercase first letter] \TTQ{{\textdollar}\{var,\}}
+        \item[\ldots{} lowercase whole string] \TTQ{{\textdollar}\{var,,\}}
+    \end{description}
+\end{description}
+
+Since this is a complex topic, a little demonstration should be in order. We will mutate the value to which a variable \TTQ{{\textdollar}var} expands:
+
+\begin{tabularx}{\textwidth}{|p{13em}|p{13em}|X|}
+    \hline Value of \TT{{\textdollar}var} & Substitution & Result \\
+    \hline \TT{foobar} & \TT{{\textdollar}\{var\textasciicircum\}} & \TT{Foobar} \\
+    \hline \TT{foobar} & \TT{{\textdollar}\{var\textasciicircum\textasciicircum\}} & \TT{FOOBAR} \\
+    \hline \TT{PATH} & \TT{{\textdollar}\{var,\}} & \TT{pATH} \\
+    \hline \TT{PATH} & \TT{{\textdollar}\{var,,\}} & \TT{path} \\
+    \hline \TT{/home/oliver/foo.txt} & \TT{{\textdollar}\{var\#\#*/\}} & \TT{foo.txt} \\
+    \hline \TT{/home/oliver/foo.txt} & \TT{{\textdollar}\{var/\%.txt\}} & \TT{/home/oliver/foo} \\
+    \hline \TT{/home/oliver/foo.txt} & \TT{{\textdollar}\{var/\#/home\}}\footnote{Note how the \TTQ{\#} makes it match the beginning of the string, but how the subsequent slash is mistaken as separator to the replacement. Next line shows how to fix this.} & \TT{home/home/oliver/foo.txt} \\
+    \hline \TT{/home/oliver/foo.txt} & \TT{{\textdollar}\{var/\#\textbackslash/home\}}\footnote{This time we are escaping the slash, thus matching the \emph{literal} \TTQ{/home} at the beginning.} & \TT{/oliver/foo.txt} \\
+    \hline \TT{/home/oliver/foo.txt} & \TT{{\textdollar}\{var\#*me\textbackslash/\}} & \TT{oliver/foo.txt} \\
+    \hline \TT{/home/oliver/foo.txt} & \TT{{\textdollar}\{var\%/*\}} & \TT{/home/oliver} \\
+    \hline \TT{/home/oliver/foo.txt} & \TT{{\textdollar}\{var:7\}} & \TT{liver/foo.txt} \\
+    \hline \TT{/home/oliver/foo.txt} & \TT{{\textdollar}\{var:7:8\}} & \TT{liver/fo} \\
+    \hline \TT{/home/oliver/foo.txt} & \TT{{\textdollar}\{var/o/0\}} & \TT{/h0me/oliver/foo.txt} \\
+    \hline \TT{/home/oliver/foo.txt} & \TT{{\textdollar}\{var//o/0\}} & \TT{/h0me/0liver/f00.txt} \\
+    \hline \TT{/home/oliver/foo.txt} & \TT{{\textdollar}\{\#var\}} & \TT{20} \\
+    \hline
+\end{tabularx}
+
+If a pattern does \emph{not match}, no substitution takes place and the result is the same as the input.
+
+\chapter{Additional resources}
+
+Where to go from here? Quite intentionally I did not call this anything like ``Advanced Bash''. The reason is that Bash is a programming language that comes with plenty of subtleties itself and ties into even more subtleties that are owed to the operating system. However, having worked through this booklet, you should be able to write even moderately complex Bash scripts with plenty of logic in them. If you ever happen to lack a certain concept or piece of syntax, you should now be able to look up the information on your own and fit it into the existing puzzle. Some topics to explore would be \emph{array variables}, \emph{here strings} and \emph{here documents} as well as \emph{signals}.
+
+\section{Books}
+
+\begin{itemize}
+	\item[\olliBook] \extlink{http://bashcookbook.com}{bash Cookbook}
+	\item[\olliBook] UNIX and Linux System Administration Handbook, 4th ed.
+	\item[\olliBook] Zsh. Die magische Shell -- a \emph{German} book about another Unix shell that shares a lot of the syntax with Bash
+\end{itemize}
+
+\section{Online resources}
+
+\begin{itemize}
+	\item[\olliLink] \extlink{https://wiki.bash-hackers.org}{Bash Hackers Wiki}
+	\item[\olliLink] \extlink{https://www.tldp.org/LDP/Bash-Beginners-Guide/html/}{Bash Guide for Beginners}
+	\item[\olliLink] \extlink{https://www.tldp.org/HOWTO/Bash-Prog-Intro-HOWTO.html}{Bash Programming -- Introduction HOW-TO}
+	\item[\olliLink] \extlink{https://www.tldp.org/LDP/abs/html/}{Advanced Bash-Scripting Guide}
+	\item[\olliLink] \extlink{http://bhami.com/rosetta.html}{A Sysadmin's Unixersal Translator} is a website that allows you to look up corresponding commands on other Unix flavors.
+	\item[\olliLink] \extlink{https://unix.stackexchange.com/}{Unix \& Linux} is a question and answer site from the StackExchange network\footnote{Some of you may also know StackOverflow or Serverfault. Same network.}
+	\item[\olliLink] \extlink{https://www.commandlinefu.com}{commandlinefu.com}, a  treasure trove of useful command lines
+	\item[\olliLink] \extlink{https://www.shortcutfoo.com/}{shortcutfoo.com}, a website to train keyboard shortcuts and commands -- it also includes a section ``Command Line''
+\end{itemize}
+
+\subsection{Look up and review the following commands yourself}
+
+As both an exercise and to get you acquainted with the shell, please look up the following:
+
+\begin{description}
+	\item[System commands] \TT{apropos}, \TT{cal}, \TT{cat}, \TT{chmod}, \TT{chown}, \TT{cut}, \TT{date}, \TT{df}, \TT{du}, \TT{file}, \TT{find}, \TT{fuser}, \TT{getent}, \TT{grep}, \TT{groups}, \TT{hostname}, \TT{id}, \TT{less}, \TT{ln}, \TT{locate}, \TT{more}, \TT{ps}, \TT{pstree}, \TT{pwd}, \TT{readlink}, \TT{rm}, \TT{rmdir}, \TT{sleep}, \TT{sort}, \TT{stat}, \TT{tail}, \TT{test}, \TT{touch}, \TT{tree}, \TT{uname}, \TT{uniq}, \TT{w}, \TT{watch}, \TT{whatis}, \TT{whereis}, \TT{which}, \TT{who}, \TT{yes}
+	\item[Bash builtins] \TT{.}, \TT{alias}, \TT{builtin}, \TT{command}, \TT{echo}, \TT{exit}, \TT{export}, \TT{false}, \TT{popd}, \TT{pushd}, \TT{pwd}, \TT{set}, \TT{shopt}, \TT{sleep}, \TT{source}, \TT{test}, \TT{time}, \TT{true}, \TT{type}, \TT{unalias}, \TT{unset}
+\end{description}
+
+{\olliHandLeft} Some commands, like \TT{test}, may appear twice. Check them out with \TT{help <command>} and \TT{man <command>} respectively.
+
+\section{This document in its raw form}
+
+This document was generated using {\ifluatex{Lua\LaTeX}\else{pdf\LaTeX}\fi}. The files used to generate it are listed as attachments below. You can use them to regenerate this document at a later point.
+
+\begin{itemize}
+    \item \textattachfile{./surviving-the-unix-shell.tex}{{\LaTeX} \TT{.tex} document \olliDownload}
+    \item \textattachfile{./olli-handout.cls}{{\LaTeX} \TT{.cls} class file \olliDownload}
+    \item \textattachfile{attachments/unix-survival.zip}{All the shell snippets in one \TT{.zip} file \olliDownload}
+\end{itemize}
+
+\tableofcontents\addcontentsline{toc}{chapter}{\contentsname}
+
+\end{document}

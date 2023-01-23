@@ -7,4 +7,6 @@ syntax: glob
 **.synctex.gz
 **.fdb_latexmk
 **.fls
+**.toc
+**.zip
 Wochentagsberechnung/weekday/target/
