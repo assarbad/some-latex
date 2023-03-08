@@ -1,14 +1,18 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{rezepte}[2021/12/19 Class for my cooking and baking recipes]
+\ProvidesClass{rezepte}[2023/03/04 Class for my cooking and baking recipes]
 
+\newif\ifrezepte@fraktur
+
+\DeclareOption{fraktur}{\rezepte@frakturtrue}
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{scrartcl}}
+\ProcessOptions\relax
 \LoadClass[version=last]{scrartcl}
 \RequirePackage{microtype}
 \RequirePackage{luaotfload}
 \RequirePackage{fontspec}
 \RequirePackage{polyglossia}
 \RequirePackage{etoolbox}
-
-\providetoggle{fraktur}
+\RequirePackage{newunicodechar}
 
 %\catcode`ſ=\active % Make ſ active
 %\newcommand ſ{s} % Now we can let it expand to s
@@ -38,17 +42,25 @@
   \catcode`ſ=\the\catcode`ſ\relax
 }
 
+\newfontfamily\symbolfont{Noto Serif Regular}[Scale=MatchUppercase]
+\newcommand\libra{{\symbolfont\symbol{"2114}}}
+\newunicodechar{^^^^2114}{\libra}
+
 \catcode`ſ=\active
 \AtBeginDocument{%
-\iftoggle{fraktur}%
-{%
+
+\ifrezepte@fraktur%
+
 \setmainfont{UnifrakturMaguntia}[Ligatures={TeX,Historic}]
-}%
-{%
+
+\else%
+
 \setmainfont{TeX Gyre Bonum}[RawFeature={fallback=genericfallback}]
 \catcode`ſ=\active%
 \protected\defſ{s}%
-}%
+
+\fi%
+
 \setsansfont{TeX Gyre Heros}
 \setmonofont{TeX Gyre Cursor}
 \setkomafont{disposition}{\bfseries} % Hauptfont auch für Überschriften

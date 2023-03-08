@@ -1,4 +1,11 @@
-\documentclass{rezepte}
+% !TeX encoding = UTF-8
+% !TeX spellcheck = de_DE_OLDSPELL
+% !TEX TS-program = lualatex
+\ifdefined\directlua\else
+    \errmessage{LuaTeX is required to typeset this document}
+    \csname @@end\expandafter\endcsname
+\fi
+\documentclass[paper=A4,fontsize=12pt,DIV=18]{rezepte}
 \usepackage[autostyle]{csquotes} %% [autostyle,german=guillemets]
 \setmainlanguage{german}
 
