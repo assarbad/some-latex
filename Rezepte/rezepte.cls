@@ -1,9 +1,9 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{rezepte}[2023/03/04 Class for my cooking and baking recipes]
+\ProvidesClass{rezepte}[2023/03/08 Class for my cooking and baking recipes]
 
-\newif\ifrezepte@fraktur
-
-\DeclareOption{fraktur}{\rezepte@frakturtrue}
+\RequirePackage{kvoptions} %% also xkeyval or scrbase, see https://tex.stackexchange.com/q/38359
+\DeclareBoolOption[false]{fraktur}
+\ProcessKeyvalOptions*
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{scrartcl}}
 \ProcessOptions\relax
 \LoadClass[version=last]{scrartcl}
