@@ -1,0 +1,50 @@
+% !TeX spellcheck = de_DE_OLDSPELL
+\documentclass[version=last,paper=A4,DIV=15]{scrartcl}
+%%\usepackage[german]{babel}
+\usepackage{microtype}
+\usepackage{luaotfload}
+\directlua{luaotfload.add_fallback("genericfallback", {"NotoSerif:mode=node;"})}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\usepackage{csquotes}
+\usepackage{textcomp}
+\setmainlanguage{german}
+\setmainfont{TeX Gyre Bonum}[RawFeature={fallback=genericfallback}]
+\setsansfont{TeX Gyre Heros}
+\setmonofont{TeX Gyre Cursor}
+
+\begin{document}
+\thispagestyle{empty}
+
+\section*{Brownies}
+
+Abwandlung des Rezepts von James Morton aus \enquote{How Baking Works (and what to do when it doesn't)}, ISBN \texttt{978-0-09-195990-6}.
+
+\subsection*{Zutaten für eine Springform mit 26 cm ⌀}
+
+\begin{itemize}
+    \item 400 g dunkle Schokolade
+    \item 400 gesalzene Butter; alternativ ungesalzene und dann 1 gestrichener TL Salz
+    \item 5 Eier plus 1 Eigelb -- 6 ganze Eier gehen aber auch
+    \item 400 g Zucker
+    \item 90 g Weizenmehl
+    \item 60-90 g Kakao zum Backen -- nach Geschmack
+    \item Optional zum Variieren: eine Handvoll Nüsse, Schokostücke oder Beeren
+\end{itemize}
+
+\subsection*{Zubereitung}
+
+\begin{itemize}
+    \item Springform fetten oder mit Backpapier auslegen.
+    \item Butter und Schokolade über einem Topf mit heißem Wasser -- oder in der Mikrowelle -- in einer Schüssel schmelzen; die Mischung dabei allenfalls lauwarm werden lassen.
+    \item In einer anderen Schüssel die Eier und den Zucker\footnote{Falls ungesalzene Butter verwendet wurde, hier das Salz zugeben.} per Hand\footnote{Es geht darum möglichst wenig Luft einzutragen, die sich im Ofen erst ausdehnt und dann zu unschönen Rissen am Ende führt.} verrühren bis alles gerade vermischt ist.
+    \item Die Schmelze zur Eier-Zucker-Mischung geben und ebenfalls per Hand verrühren bis alles gerade vermischt ist. Siehe vorheriger Schritt.
+    \item Mehl und Kakaopulver -- sowie die optionalen Zutaten -- hinzufügen und sachte\footnote{Es gilt die Entwicklung von Gluten -- also Klebereiwiß -- zu vermeiden/minimieren.} vermischen.
+    \item Neunzig (90) Minuten bei 160 °C (140 °C bei Umluft\footnote{Bei Umluft würde ich Alufolie über die Springform spannen.}) backen.
+\end{itemize}
+
+\subsection*{Lagerung}
+
+Die Brownies halten sich meist ein paar Tage bei Zimmertemperatur, schmecken aber auch direkt aus dem Kühlschrank hervorragend und halten sich dort entsprechend länger.
+
+\end{document}

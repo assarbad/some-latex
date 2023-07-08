@@ -1,4 +1,4 @@
-BASENAME:=dal-makhni muerbeplaetzchen pfefferkuchen Einheitentabelle
+BASENAME:=dal-makhni Mürbeplätzchen Brownies Pfefferkuchen Einheitentabelle
 TEX:=$(addsuffix .tex,$(BASENAME))
 ALL:=$(TEX:.tex=.pdf)
 INTERMEDIATE:=$(TEX:.tex=.aux) $(TEX:.tex=.fdb_latexmk) $(TEX:.tex=.fls) $(TEX:.tex=.log) $(TEX:.tex=.nav) $(TEX:.tex=.out) $(TEX:.tex=.snm) $(TEX:.tex=.synctex.gz) $(TEX:.tex=.toc) $(TEX:.tex=.vrb)

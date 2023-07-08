@@ -52,6 +52,14 @@
 \ifrezepte@fraktur%
 
 \setmainfont{UnifrakturMaguntia}[Ligatures={TeX,Historic}]
+% StylisticSet=15 == Diaresis -> small e
+% Ligatures=Historic/Rare/NoCommon
+% Numbers=Uppercase/Monospaces
+% CharacterVariant=19 wide emdash
+%\setsansfont[ % spaced letters instead of bold text
+%    BoldFont = UnifrakturMaguntia,
+%    BoldFeatures = {LetterSpace=8.0, Ligatures=NoCommon, Kerning=Off}
+%]{UnifrakturMaguntia}
 
 \else%
 
@@ -67,3 +75,49 @@
 \thispagestyle{empty}%
 }%
 \ResetLongSCatcode
+
+
+
+%see either the mathspec package or the unicode-math package.
+%
+%\defaultfontfeatures{⟨font features⟩}
+%\defaultfontfeatures[⟨font name⟩]{⟨font features⟩}
+%
+%To reset default font features, simply call the command with an empty argument:
+%\defaultfontfeatures[\rmfamily,\sffamily]{}
+%\setmainfont{texgyreadventor-regular.otf}% will no longer use standard TeX ligatures
+%
+%\addfontfeature{Numbers=OldStyle}...
+%\addfontfeature{Numbers=Lining}...
+%123
+%
+%BoldFeatures={⟨features⟩}
+%ItalicFeatures={⟨features⟩}
+%BoldItalicFeatures={⟨features⟩}
+%SlantedFeatures={⟨features⟩}
+%BoldSlantedFeatures={⟨features⟩}
+%SwashFeatures={⟨features⟩}
+%BoldSwashFeatures={⟨features⟩}
+%SmallCapsFeatures={⟨features⟩}
+%UprightFeatures={⟨features⟩}
+%
+%\defaultfontfeatures{ Scale = MatchLowercase }
+%\defaultfontfeatures[\rmfamily]{ Scale = 1}
+%
+%\IfFontExistsTF{⟨font name⟩}{⟨true branch⟩}{⟨false branch⟩}
+%
+%\documentclass{article}
+%\usepackage{fontspec}
+%\directlua{
+%fonts.handlers.otf.addfeature {
+%name = "oneb",
+%type = "substitution",
+%data = {
+%["1"] = "one.ss01",
+%}
+%}
+%}
+%\setmainfont{Vollkorn-Regular.otf}[RawFeature=+oneb]
+%\begin{document}
+%1234567890
+%\end{document}
