@@ -1,44 +1,42 @@
-\documentclass[version=last,paper=A4]{scrartcl}
-%%\usepackage[german]{babel}
-\usepackage{microtype}
-\usepackage{luaotfload}
-\directlua{luaotfload.add_fallback("genericfallback", {"NotoSerif:mode=node;"})}
-\usepackage{fontspec}
-\usepackage{polyglossia}
-\usepackage{csquotes}
+% !TeX encoding = UTF-8
+% !TeX spellcheck = de_DE_OLDSPELL
+% !TEX TS-program = lualatex
+\ifdefined\directlua\else
+    \errmessage{LuaTeX is required to typeset this document}
+    \csname @@end\expandafter\endcsname
+\fi
+\documentclass[paper=A4,fontsize=12pt,DIV=18,fraktur=false]{rezepte}
+\usepackage[autostyle]{csquotes} %% [autostyle,german=guillemets]
 \setmainlanguage{german}
-\setmainfont{TeX Gyre Bonum}[RawFeature={fallback=genericfallback}]
-\setsansfont{TeX Gyre Heros}
-\setmonofont{TeX Gyre Cursor}
 
 \begin{document}
-\thispagestyle{empty}
 
-\section*{Mürbeplätzchen}
+\section*{Omas Mürbeplätzchen}
 
 \subsection*{Zutaten}
 
 \begin{itemize}
     \item 2~℔ Weizenmehl\\
-    Type 405 oder doppelgriffig (\enquote{Instant-Mehl})\footnote{Andere Mehlsorten verfälschen das Ergebnis.}
-    \item 350~g Kristallzucker, je feinkörniger desto besser
-    \item Buttervanille entsprechend der Mehlmenge
-    \item 2 gestrichene Teelöffel Salz
-    \item 1~℔ Butter\footnote{Kein Butterschmalz, wir brauchen die bindenden Anteile der Butter, kein Reinfett!}, sehr weich oder geschmolzen, aber höchstens handwarm
-    \item 13-14 Eigelbe (ca. 230..250~g)
+    Type 405 oder doppelgriffig (\enquote{Instant-Mehl})\footnote{Andere Mehlſorten verfälſchen das Ergebnis.}
+    \item 400~g Kriſtallzucker\footnote{Originalrezept verlangt 500~g, bis 350~g wurde ſchon probiert. Achtung: weniger Zucker bedeutet hier geringere Haltbarkeit.}, je feinkörniger deſto beſſer
+    \item Buttervanille entſprechend der Mehlmenge
+    \item 1-2 geſtrichene Teelöffel Salz
+    \item 1~℔ Butter\footnote{Kein Butterſchmalz/-reinfett, wir brauchen die bindenden/emulgierenden Anteile der Butter!}, ſehr weich oder geſchmolzen, aber höchſtens handwarm
+    \item 13-14 Eigelbe\footnote{Etwas Eiweiß aufheben zum ſpäteren Beſtreichen der Plätzchen.} (ca. 210..250~g)\footnote{Je mehr Eigelbe, deſto mürber. Je mürber deſto kühler ſollte der Teig verarbeitet werden.}
 \end{itemize}
 
 \subsection*{Zubereitung}
 
 \begin{itemize}
-    \item Mehl, Zucker, Buttervanille und Salz gründlich vermengen. Danach die Butter untermengen und \enquote{verreiben} um ein möglichst gute Verteilung zu gewährleisten. Zuletzt mit den Eigelben zu einem gleichmäßigen Teig verkneten.
-    \item Optional den Teig für mindestens eine halbe Stunde kaltstellen. Das hilft bei beim Ausstechen, da der Teig damit fester wird. Kaltstellen erschwert jedoch auch das Ausrollen.
-    \item Einen Teil des Eiweißes leicht schlagen und vor dem Backen auf die Plätzchen streichen\footnote{Es soll nicht schaumig werden, sondern nur weniger dickflüssig.}. Dies sorgt für eine glänzende Oberfläche.
-    \item Bei 200°C Umluft etwa 10~Minuten backen, bis sie anfangen gold-braun zu werden.
+    \item Eigelbe, Zucker, Salz und Buttervanille mit einem Rührgerät gut vermiſchen. Dann Butter hinzugeben und nochmals gründlich vermiſchen.
+    \item Mehl zu der Miſchung geben und gut durchkneten.
+    \item Optional den Teig für mindeſtens eine halbe Stunde kaltſtellen. Das hilft bei beim Ausſtechen, da der Teig damit feſter wird. Kaltſtellen erſchwert jedoch auch das Ausrollen.
+    \item Einen Teil des Eiweißes leicht ſchlagen und vor dem Backen auf die Plätzchen ſtreichen\footnote{Es ſoll nicht ſchaumig werden, ſondern nur weniger dickflüſſig.}. Dies ſorgt für eine glänzende Oberfläche.
+    \item Bei 200°C Umluft etwa 10~Minuten backen, bis ſie anfangen gold-braun zu werden.
 \end{itemize}
 
 \subsection*{Lagerung}
 
-Die Plätzchen möglichst luftdicht und vor Feuchtigkeit geschützt bei Zimmertemperatur oder leicht kühl aufbewahren. Halten sich erfahrungsgemäß mehrere Wochen.
+Die Plätzchen möglichſt luftdicht und vor Feuchtigkeit geſchützt bei Zimmertemperatur oder leicht kühl aufbewahren. Halten ſich erfahrungsgemäß mehrere Wochen.
 
 \end{document}
